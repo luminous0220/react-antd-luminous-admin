@@ -1,0 +1,76 @@
+// 按钮渐变
+.banner-gradient-btn {
+  position: relative;
+  background: transparent !important;
+  border-color: transparent !important;
+
+  > span {
+    position: relative;
+    z-index: 2;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--btn-gradient);
+    background-size: 200% 100%;
+    border-radius: inherit;
+    z-index: 1;
+    animation: btnGradientFlow 3s linear infinite;
+    transition: opacity 0.3s;
+  }
+
+  &:hover::before {
+    opacity: 0.85;
+  }
+}
+
+@keyframes btnGradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+// Banner 装饰动画
+@keyframes bannerArc1 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(-12px, 8px) scale(1.05);
+  }
+}
+
+@keyframes bannerArc2 {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(8px, -10px) scale(1.08);
+  }
+}
+
+@keyframes bannerFloat {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes bannerPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}

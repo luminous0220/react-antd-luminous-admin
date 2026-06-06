@@ -1,0 +1,14 @@
+/* Disable default View Transitions cross-fade */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+}
+
+/* Keep old snapshot on top so the clip-path reveal of the new one is visible */
+::view-transition-old(root) {
+	z-index: 1;
+}
+
+::view-transition-new(root) {
+	z-index: 9999;
+}

@@ -1,0 +1,232 @@
+/* ProTable 增强表格样式 */
+
+/* 容器样式 */
+/* 工具栏样式 */
+.pro-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--color-border-secondary);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.pro-table-toolbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pro-table-toolbar .ant-space {
+  display: flex;
+  gap: 8px;
+}
+
+/* 工具栏按钮样式 */
+.pro-table-toolbar .ant-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+.pro-table-toolbar .ant-btn:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* 选中信息样式 */
+.pro-table-selected-info {
+  margin-bottom: 12px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.pro-table-selected-info .ant-alert {
+  border-radius: 6px;
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary-border);
+}
+
+/* 表格主体容器 */
+.pro-table-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 表格内部样式调整 */
+.pro-table-body .ant-table {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* 固定表格布局 — 避免容器宽度变化时逐列重算内容宽度 */
+.pro-table-body table {
+  table-layout: fixed;
+}
+
+.pro-table-body .ant-table-thead > tr > th {
+  background: var(--color-bg-layout) !important;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+  padding: 12px 16px;
+}
+
+.pro-table-body .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--color-border-secondary);
+  transition: all 0.2s ease;
+  padding: 12px 16px;
+}
+
+.pro-table-body .ant-table-tbody > tr:hover > td {
+  background: var(--color-bg-text-hover) !important;
+}
+
+.pro-table-body .ant-table-tbody > tr {
+  transition: all 0.2s ease;
+}
+
+/* 选中行样式 */
+.pro-table-body .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: var(--color-primary-bg) !important;
+  border-color: var(--color-primary-border);
+}
+
+/* 分页器样式 */
+.pro-table-body .ant-pagination {
+  margin: 16px 0 0;
+  padding: 8px 0;
+}
+
+.pro-table-body .ant-pagination-item {
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.pro-table-body .ant-pagination-item:hover {
+  border-color: var(--color-primary);
+}
+
+/* 列设置面板样式 */
+.pro-table-column-panel {
+  width: 280px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.pro-table-column-panel-header {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px dashed var(--color-border-secondary);
+  background: var(--color-bg-layout);
+  border-radius: 4px;
+}
+
+/* 可拖拽列项样式 */
+.pro-table-column-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--color-bg-container);
+  border-radius: 6px;
+  cursor: move;
+  transition: all 0.2s ease;
+  border: 1px solid var(--color-border-secondary);
+  margin-bottom: 6px;
+}
+
+.pro-table-column-item:hover {
+  background: var(--color-bg-text-hover);
+  border-color: var(--color-border);
+  transform: translateX(2px);
+}
+
+.pro-table-column-item-dragging {
+  opacity: 0.7;
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transform: scale(1.02);
+}
+
+.pro-table-column-item .ant-checkbox-wrapper {
+  flex: 1;
+}
+
+.pro-table-column-item-label {
+  flex: 1;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pro-table-column-item-fixed-select {
+  width: 90px;
+}
+
+/* 空数据提示样式 */
+.pro-table-body .ant-empty {
+  padding: 48px 0;
+}
+
+.pro-table-body .ant-empty-description {
+  color: var(--color-text-secondary);
+}
+
+/* 加载状态样式 */
+.pro-table-body .ant-spin-nested-loading {
+  min-height: 200px;
+}
+
+/* 深色模式优化 */
+.dark .pro-table-wrapper {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark .pro-table-wrapper:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.dark .pro-table-column-item-dragging {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .pro-table-wrapper {
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+
+  .pro-table-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 6px 0 8px;
+    margin-bottom: 8px;
+  }
+
+  .pro-table-toolbar-title {
+    font-size: 14px;
+  }
+
+  .pro-table-column-panel {
+    width: 240px;
+    max-height: 280px;
+  }
+
+  .pro-table-body .ant-table-thead > tr > th,
+  .pro-table-body .ant-table-tbody > tr > td {
+    padding: 8px 12px;
+  }
+}

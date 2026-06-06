@@ -1,0 +1,91 @@
+:root {
+	--top-height: 52px;
+}
+
+.flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.abs-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+// 文字阴影效果
+.text-shadow-primary {
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+// 深色模式下文字阴影更柔和
+.dark .text-shadow-primary {
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 浮动小卡片上下浮动动画 */
+@keyframes float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-12px);
+	}
+}
+
+.float-card {
+	animation: float 3s ease-in-out infinite;
+}
+
+/* 主卡片上下浮动动画 */
+@keyframes float-main {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-18px);
+	}
+}
+
+.float-main-card {
+	animation: float-main 4s ease-in-out infinite;
+}
+
+/* 动画延迟 */
+.animate-delay-800 {
+	animation-delay: 0.8s;
+}
+
+.animate-delay-1500 {
+	animation-delay: 1.5s;
+}
+
+/* 页面切换过渡动画 */
+
+/* 默认状态 */
+.transition-wrapper {
+	opacity: 1;
+	transform: translateX(0);
+	transition:
+		opacity 0.25s ease-out,
+		transform 0.25s ease-out;
+}
+
+/* 淡出：从左往右 0→30px，透明度降低 */
+.page-exit {
+	opacity: 0;
+	transform: translateX(30px);
+	transition:
+		opacity 0.2s ease-in,
+		transform 0.2s ease-in;
+}
+
+/* 淡入初始状态：从左侧 -30px 开始 */
+.page-enter {
+	opacity: 0;
+	transform: translateX(-30px);
+}
