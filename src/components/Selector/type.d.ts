@@ -68,8 +68,8 @@ export interface TableSelectorProps<T = Record<string, any>> extends Omit<
 	 */
 	selectionType?: "checkbox" | "radio";
 
-	/** 树形数据源中 label 字段名，默认 "name" */
+	/** 行数据中标题字段名，默认 "name" */
 	labelKey?: string;
-	/** 树形数据源中 desc 字段名，默认 "desc" */
+	/** 行数据中描述字段名，默认 "desc" */
 	descKey?: string;
 }

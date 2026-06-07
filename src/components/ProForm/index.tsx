@@ -1,273 +1,24 @@
-import {
-	forwardRef,
-	useImperativeHandle,
-	useMemo,
-	useRef,
-	useState,
-	useCallback,
-	memo,
-} from "react";
-import {
-	Form,
-	Input,
-	InputNumber,
-	Select,
-	TreeSelect,
-	Switch,
-	Radio,
-	Checkbox,
-	DatePicker,
-	TimePicker,
-	Divider,
-	Button,
-	Drawer,
-} from "antd";
-import type { FormInstance } from "antd";
-import type { DividerProps } from "antd/es/divider";
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { Form, Button, Drawer } from "antd";
 import type {
 	ProFormProps,
-	FormFieldItem,
-	FormValues,
 	TypedFieldConfig,
 	ComponentType,
 	ProFormInstance,
-} from "./type";
+} from "./types";
 import {
-	isVisible,
-	isDisabled,
 	getFieldKey,
 	formatTimeFields,
 	filterHiddenFields,
 	normalizeTimeFields,
+	isDividerField,
+	isCustomField,
 } from "./utils";
-import { ProUpload, ProUploadProps } from "../ProUpload";
 import { ProModal } from "../ProModal";
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
-
-/** 判断是否为 Divider 字段 */
-function isDividerField(
-	field: FormFieldItem,
-): field is TypedFieldConfig<"divider"> {
-	return field.type === "divider";
-}
-
-/** 判断是否为自定义渲染字段（无 type） */
-function isCustomField(field: FormFieldItem): boolean {
-	return !field.type;
-}
-
-const normFile = (e: any) => {
-	e?.fileList.forEach((item: any) => {
-		if (item.status === "done" && item.response) {
-			// response 被全局拦截器包装为 { code, message, data: {...} }
-			const data = item.response.data || item.response;
-			item.fileName = data?.fileName || data?.fileName || item.name;
-			item.url = data?.url || item.url;
-		}
-	});
-	return e?.fileList;
-};
-
-/**
- * 渲染单个表单控件
- */
-function renderControl(
-	type: ComponentType,
-	fieldProps: object | undefined,
-	disabled: boolean,
-): React.ReactNode {
-	const props = { ...fieldProps, disabled };
-
-	switch (type) {
-		case "input":
-			return <Input {...props} />;
-		case "input-password":
-			return <Input.Password {...props} />;
-		case "textarea":
-			return <Input.TextArea {...props} />;
-		case "input-number":
-			return <InputNumber {...props} />;
-		case "select":
-			return <Select {...props} />;
-		case "tree-select":
-			return <TreeSelect {...props} />;
-
-		case "switch":
-			return <Switch {...props} />;
-		case "radio":
-			return <Radio.Group {...props} />;
-		case "checkbox":
-			return <Checkbox.Group {...props} />;
-		case "date-picker":
-			return <DatePicker {...props} />;
-		case "time-picker":
-			return <TimePicker {...props} />;
-		default:
-			return null;
-	}
-}
-
-/**
- * Divider 字段组件 - 无状态，无需监听表单值
- */
-const DividerField = memo(function DividerField({
-	field,
-	index,
-}: {
-	field: TypedFieldConfig<"divider">;
-	index: number;
-}) {
-	const key = getFieldKey(field, index);
-	const dividerProps = (field.fieldProps ?? {}) as DividerProps;
-	return <Divider key={key} {...dividerProps} />;
-});
-
-/**
- * 标准表单字段组件
- * 只监听自身需要的值用于 visible/disabled 判断
- */
-const StandardField = memo(function StandardField({
-	field,
-	form,
-	isInlineMode,
-}: {
-	field: TypedFieldConfig<ComponentType>;
-	form: FormInstance;
-	isInlineMode: boolean;
-}) {
-	const { name, label, rules } = field;
-
-	// 监听整个表单值用于 visible/disabled 计算
-	// 只有在 visible/disabled 是函数时才需要
-	const needsWatch =
-		typeof field.visible === "function" || typeof field.disabled === "function";
-
-	const initialValue = form.getFieldValue(field.name);
-	const hidden = field.visible === false;
-	const disabled = field.disabled === true;
-	const className = isInlineMode ? "min-w-[160px]" : "";
-	const commonProps = {
-		name,
-		label,
-		rules,
-		hidden,
-		className,
-	};
-
-	if (field.type === "upload") {
-		return (
-			<Form.Item
-				{...commonProps}
-				{...field.formItemProps}
-				valuePropName="fileList"
-				getValueFromEvent={normFile}
-			>
-				<ProUpload
-					{...(field.fieldProps as ProUploadProps)}
-					defaultFileList={Array.isArray(initialValue) ? initialValue : []}
-				/>
-			</Form.Item>
-		);
-	}
-
-	if (isCustomField(field) && field.render) {
-		return (
-			<Form.Item {...commonProps} {...field.formItemProps}>
-				<Form.Item noStyle shouldUpdate={true}>
-					{() => field.render!(form.getFieldValue(field.name), form)}
-				</Form.Item>
-			</Form.Item>
-		);
-	}
-
-	if (needsWatch) {
-		return (
-			<Form.Item noStyle shouldUpdate>
-				{() => {
-					const values = form.getFieldsValue() as FormValues;
-					const hidden = !isVisible(field, values);
-					const disabled = isDisabled(field, values);
-
-					if (hidden) {
-						return (
-							<Form.Item
-								name={field.name}
-								label={field.label}
-								rules={field.rules}
-								hidden
-								{...field.formItemProps}
-							>
-								{renderControl(
-									field.type!,
-									field.fieldProps as object,
-									disabled,
-								)}
-							</Form.Item>
-						);
-					}
-
-					return (
-						<Form.Item
-							name={field.name}
-							label={field.label}
-							rules={field.rules}
-							{...field.formItemProps}
-						>
-							{renderControl(field.type!, field.fieldProps as object, disabled)}
-						</Form.Item>
-					);
-				}}
-			</Form.Item>
-		);
-	}
-
-	return (
-		<Form.Item {...commonProps} {...field.formItemProps}>
-			{renderControl(field.type!, field.fieldProps as object, disabled)}
-		</Form.Item>
-	);
-});
-
-/**
- * Footer 按钮组件（重置 + 确认）
- */
-const FormFooter = memo(function FormFooter({
-	footer,
-	loading,
-	onConfirm,
-	onReset,
-}: {
-	footer: NonNullable<ProFormProps["footer"]>;
-	loading: boolean;
-	onConfirm: () => void;
-	onReset: () => void;
-}) {
-	const {
-		confirmText = "确认",
-		resetText = "重置",
-		hideConfirm,
-		hideReset,
-		confirmStyle,
-	} = footer;
-
-	return (
-		<Form.Item className="mb-0">
-			<div className="flex items-center justify-end w-full gap-4">
-				{!hideReset && <Button onClick={onReset}>{resetText}</Button>}
-				{!hideConfirm && (
-					<Button
-						type="primary"
-						{...confirmStyle}
-						loading={loading}
-						onClick={onConfirm}
-					>
-						{confirmText}
-					</Button>
-				)}
-			</div>
-		</Form.Item>
-	);
-});
+import { DividerField } from "./components/DividerField";
+import { StandardField } from "./components/StandardField";
+import { FormFooter } from "./components/FormFooter";
 
 /**
  * ProForm 配置化表单组件
@@ -615,4 +366,4 @@ export type {
 	ProFormInstance,
 	ProFormMode,
 	FormValues,
-} from "./type";
+} from "./types";

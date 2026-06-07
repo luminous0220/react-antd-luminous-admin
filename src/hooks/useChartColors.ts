@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useThemeStore, type ColorVariants } from "@/stores/theme";
-import type { ChartColorSet } from "@/components/Chart/type";
+import type { ChartColorSet } from "@/components/Chart/types";
 
 export function getChartColors(
 	variants: ColorVariants,

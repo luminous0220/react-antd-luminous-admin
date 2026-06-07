@@ -1,5 +1,5 @@
 import { Avatar, Card, Image } from "antd";
-import type { MediaCardProps } from "../type";
+import type { MediaCardProps } from "../types";
 
 const { Meta } = Card;
 

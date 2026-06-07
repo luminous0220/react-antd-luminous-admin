@@ -35,6 +35,7 @@ export const SelectedPanel: React.FC<SelectedPanelProps> = ({
 		<Card
 			className={className}
 			classNames={{
+				header: "!bg-[var(--ant-color-bg-layout)]",
 				body: bodyClassName,
 			}}
 			styles={{

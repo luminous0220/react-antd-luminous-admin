@@ -2,19 +2,18 @@ import { useState, useCallback, useMemo } from "react";
 import { ProModal } from "@/components/ProModal";
 import { ProTable } from "@/components/ProTable";
 import type { ProTableColumnType } from "@/components/ProTable";
-import { SelectorTrigger } from "./SelectorTrigger";
-import { SelectedPanel } from "./SelectedPanel";
-import type { SelectedItem } from "./SelectedPanel";
-import { SelectorFooter } from "./SelectorFooter";
+import { SelectorTrigger } from "./components/SelectorTrigger";
+import { SelectedPanel } from "./components/SelectedPanel";
+import type { SelectedItem } from "./components/SelectedPanel";
+import { SelectorFooter } from "./components/SelectorFooter";
 import type { TableSelectorNode, TableSelectorProps } from "./type";
 
 export type { TableSelectorNode, TableSelectorProps } from "./type";
 
 /**
- * @description TableSelector 表格选择器（单选/多选）
- * 数据完全通过 api 请求获取，不依赖外部 dataSource。
- * 选中项跨分页保留，通过 itemCache 缓存行详情。
- * 继承 ProTable 全部 props（除 rowSelection/onSelectRows/dataSource 由内部管理）。
+* @description TableSelector 表格选择器（单选/多选）
+ * - 默认模式：触发器 + ProModal（ProTable + 已选面板 + 底部操作栏）
+ * 数据完全通过 api 请求获取，选中项跨分页保留。
  */
 export function TableSelector<
 	T extends Record<string, any> = Record<string, any>,
@@ -87,14 +86,17 @@ export function TableSelector<
 	}, []);
 
 	// 右侧已选列表单项删除
-	const removeSelectedItem = useCallback((item: TableSelectorNode) => {
-		setModalCheckedKeys((prev) => prev.filter((k) => k !== item.value));
-		setModalItemCache((prev) => {
-			const next = { ...prev };
-			delete next[String(item.value)];
-			return next;
-		});
-	}, []);
+	const removeSelectedItem = useCallback(
+		(item: TableSelectorNode) => {
+			setModalCheckedKeys((prev) => prev.filter((k) => k !== item.value));
+			setModalItemCache((prev) => {
+				const next = { ...prev };
+				delete next[String(item.value)];
+				return next;
+			});
+		},
+		[],
+	);
 
 	// 触发器 Tag 删除（直接提交 onChange）
 	const removeTag = useCallback(
@@ -111,24 +113,20 @@ export function TableSelector<
 	const rowSelection = useMemo(() => {
 		const radio = selectionType === "radio";
 		return {
-			selectedRowKeys: radio ? modalCheckedKeys.slice(-1) : modalCheckedKeys,
+			selectedRowKeys: radio
+				? modalCheckedKeys.slice(-1)
+				: modalCheckedKeys,
 			onChange: (keys: React.Key[], rows: T[]) => {
 				const finalKeys = radio ? keys.slice(-1) : keys;
 				setModalCheckedKeys(finalKeys);
-				// 合并当前页行数据到缓存，保留其他页已有的缓存项
 				setModalItemCache((prev) => {
 					const next = { ...prev };
 					for (const row of rows) {
 						const title = (row as any)[labelKey];
 						const value = (row as any)[rowKey];
 						const desc = (row as any)[descKey];
-						next[value] = {
-							title,
-							value,
-							desc,
-						};
+						next[value] = { title, value, desc };
 					}
-					// 清理不在选中集合中的旧 key
 					const keySet = new Set(finalKeys.map(String));
 					for (const k of Object.keys(next)) {
 						if (!keySet.has(String(k))) delete next[k];
@@ -140,7 +138,7 @@ export function TableSelector<
 		};
 	}, [modalCheckedKeys, selectionType, rowKey, labelKey, descKey]);
 
-	// ProTable 合并 props
+	// ProTable 合并 props（选择器模式）
 	const proTableProps: Record<string, any> = {
 		...restProps,
 		columns: columns as ProTableColumnType<T>[],

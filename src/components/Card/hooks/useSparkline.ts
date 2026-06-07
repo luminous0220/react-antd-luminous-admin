@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import * as echarts from "echarts";
 import type { EChartsOption } from "echarts";
-import { SparklineType } from "../type";
+import { SparklineType } from "../types";
 
 
 export function useSparklineOption(

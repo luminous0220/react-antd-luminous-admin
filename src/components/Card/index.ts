@@ -15,4 +15,4 @@ export type {
 	ActivityItem,
 	TransactionItem,
 	SparklineType,
-} from "./type.d";
+} from "./types";

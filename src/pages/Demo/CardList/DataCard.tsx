@@ -6,7 +6,7 @@ import type {
   TodoCardProps,
   ActivityCardProps,
   TransactionCardProps,
-} from "@/components/Card/type.d";
+} from "@/components/Card/types";
 
 // ---- Todo Card ----
 

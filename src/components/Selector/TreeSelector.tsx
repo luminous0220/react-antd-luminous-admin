@@ -2,9 +2,9 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import { Tree, Input, Button, Card } from "antd";
 import { IconSearch } from "@tabler/icons-react";
 import { ProModal } from "@/components/ProModal";
-import { SelectorTrigger } from "./SelectorTrigger";
-import { SelectedPanel, type SelectedItem } from "./SelectedPanel";
-import { SelectorFooter } from "./SelectorFooter";
+import { SelectorTrigger } from "./components/SelectorTrigger";
+import { SelectedPanel, type SelectedItem } from "./components/SelectedPanel";
+import { SelectorFooter } from "./components/SelectorFooter";
 import type { TreeNodeData, TreeSelectorNode, TreeSelectorProps } from "./type";
 
 export type { TreeNodeData, TreeSelectorNode, TreeSelectorProps } from "./type";

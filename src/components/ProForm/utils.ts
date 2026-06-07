@@ -7,7 +7,7 @@ import type {
 	TimeFieldType,
 	TimeFieldValue,
 	TypedFieldConfig,
-} from "./type";
+} from "./types";
 
 /** antd Form.Item name 类型（支持嵌套路径） */
 type FieldName = string | string[];
@@ -16,6 +16,14 @@ type FieldName = string | string[];
 function toPath(name: FieldName | undefined): string[] {
 	if (!name) return [];
 	return Array.isArray(name) ? [...name] : [name];
+}
+
+/** 判断是否为自定义渲染字段（无 type） */
+export function isCustomField(field: {
+	type?: string;
+	render?: unknown;
+}): boolean {
+	return !field.type;
 }
 
 /** 读取嵌套对象中的值，path 为 ['user', 'name'] 形式的路径数组 */
@@ -52,10 +60,7 @@ function setNestedValue(
 }
 
 /** 删除嵌套对象中的值 */
-function unsetNestedValue(
-	obj: Record<string, unknown>,
-	name: FieldName,
-): void {
+function unsetNestedValue(obj: Record<string, unknown>, name: FieldName): void {
 	const path = toPath(name);
 	if (path.length === 0) return;
 	let current: Record<string, unknown> | undefined = obj;
@@ -147,7 +152,11 @@ export function formatTimeFields(
 			const fieldValue = getNestedValue(result, name) as Dayjs | null;
 			if (fieldValue != null) {
 				const format = getTimeFieldFormat(field);
-				setNestedValue(result, name, fromDayjs(fieldValue, field.type!, format));
+				setNestedValue(
+					result,
+					name,
+					fromDayjs(fieldValue, field.type!, format),
+				);
 			}
 		}
 	}
@@ -243,6 +252,25 @@ export function isDisabled(field: FormFieldItem, values: FormValues): boolean {
  * 生成字段的唯一 key
  * 用于列表渲染时的 key 属性
  */
+/** 判断是否为 Divider 字段 */
+export function isDividerField(
+	field: FormFieldItem,
+): field is TypedFieldConfig<"divider"> {
+	return field.type === "divider";
+}
+
+/** 文件上传规范化（提取全局拦截器包装后的响应数据） */
+export function normFile(e: any) {
+	e?.fileList.forEach((item: any) => {
+		if (item.status === "done" && item.response) {
+			const data = item.response.data || item.response;
+			item.fileName = data?.fileName || data?.fileName || item.name;
+			item.url = data?.url || item.url;
+		}
+	});
+	return e?.fileList;
+}
+
 export function getFieldKey(field: FormFieldItem, index: number): string {
 	const name = field.name;
 	if (!name) return `field-${index}`;

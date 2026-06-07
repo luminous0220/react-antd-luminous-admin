@@ -1,30 +1,10 @@
 // src/components/ThemePanel/ThemePanel.tsx
-import { Button, ColorPicker, Divider, Switch, Tooltip, Typography } from "antd";
+import { ColorPicker, Divider, Switch, Typography } from "antd";
 import { IconSun, IconMoon } from "@tabler/icons-react";
 import { PRESET_COLORS, PresetColorKey, useThemeStore } from "@/stores/theme";
+import { ColorItem } from "./components/ColorItem";
 
 const { Text } = Typography;
-
-const ColorItem = ({
-  color,
-  label,
-  isActive,
-  onClick,
-}: {
-  color: string;
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-}) => (
-  <Tooltip title={label} placement="top">
-    <Button
-      onClick={onClick}
-      className={`flex items-center justify-center w-8 h-8 rounded-full ${isActive ? "outline-2! outline-offset-2" : ""
-        }`}
-      style={{ backgroundColor: color, outlineColor: isActive ? color : "transparent" }}
-    />
-  </Tooltip>
-);
 
 // 主题设置抽屉组件
 export const ThemePanel = () => {

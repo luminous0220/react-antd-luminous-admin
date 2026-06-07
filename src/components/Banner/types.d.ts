@@ -21,3 +21,12 @@ interface ColorScheme {
 }
 
 type PresetEntry = { light: ColorScheme; dark: ColorScheme };
+
+export interface BannerProps {
+	type?: BannerType;
+	title?: string;
+	description?: string;
+	buttonText?: string;
+	img?: string;
+	onButtonClick?: () => void;
+}

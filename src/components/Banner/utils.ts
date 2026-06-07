@@ -1,4 +1,4 @@
-import { BannerType, PresetEntry } from "./type";
+import { BannerType, PresetEntry } from "./types";
 
 export const PRESETS: Record<BannerType, PresetEntry> = {
 	blue: {

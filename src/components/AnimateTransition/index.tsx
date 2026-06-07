@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AnimateTransitionProps } from "./type";
+import { AnimateTransitionProps } from "./types";
 
 
 export const AnimateTransition = ({

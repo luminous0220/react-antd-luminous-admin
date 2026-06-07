@@ -98,6 +98,22 @@ const MOCK_MENUS_TREE = [
 		desc: "各类 UI 组件展示",
 		children: [
 			{
+				id: "menu-comp-0",
+				name: "selector-demo",
+				title: "数据选择&查看",
+				sort: 0,
+				parentId: "menu-components",
+				path: "/components/selector-demo",
+				icon: "NumberOutlined",
+				componentPath: "/Demo/SelectorDemo",
+				status: 1,
+				permission: "",
+				type: 2,
+				desc: "",
+				children: [],
+				createTime: "2024-01-01 00:00:00",
+			},
+			{
 				id: "menu-comp-1",
 				name: "card-list",
 				title: "卡片",

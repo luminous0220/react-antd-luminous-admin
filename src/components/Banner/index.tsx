@@ -1,17 +1,8 @@
 import { Button } from "antd";
 import { useThemeStore } from "@/stores";
 import "./index.scss";
-import { BannerType } from "./type";
+import { BannerProps } from "./types";
 import { PRESETS } from "./utils";
-
-export interface BannerProps {
-	type?: BannerType;
-	title?: string;
-	description?: string;
-	buttonText?: string;
-	img?: string;
-	onButtonClick?: () => void;
-}
 
 export const Banner: React.FC<BannerProps> = ({
 	type = "blue",
@@ -105,3 +96,5 @@ export const Banner: React.FC<BannerProps> = ({
 		</div>
 	);
 };
+
+export * from "./types";
