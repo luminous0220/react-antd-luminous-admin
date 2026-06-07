@@ -6,9 +6,9 @@ import { SelectorTrigger } from "./components/SelectorTrigger";
 import { SelectedPanel } from "./components/SelectedPanel";
 import type { SelectedItem } from "./components/SelectedPanel";
 import { SelectorFooter } from "./components/SelectorFooter";
-import type { TableSelectorNode, TableSelectorProps } from "./type";
+import type { TableSelectorNode, TableSelectorProps } from "./types";
 
-export type { TableSelectorNode, TableSelectorProps } from "./type";
+export type { TableSelectorNode, TableSelectorProps } from "./types";
 
 /**
 * @description TableSelector 表格选择器（单选/多选）

@@ -5,9 +5,9 @@ import { ProModal } from "@/components/ProModal";
 import { SelectorTrigger } from "./components/SelectorTrigger";
 import { SelectedPanel, type SelectedItem } from "./components/SelectedPanel";
 import { SelectorFooter } from "./components/SelectorFooter";
-import type { TreeNodeData, TreeSelectorNode, TreeSelectorProps } from "./type";
+import type { TreeNodeData, TreeSelectorNode, TreeSelectorProps } from "./types";
 
-export type { TreeNodeData, TreeSelectorNode, TreeSelectorProps } from "./type";
+export type { TreeNodeData, TreeSelectorNode, TreeSelectorProps } from "./types";
 
 // ---- 树操作工具函数 ----
 
@@ -162,7 +162,7 @@ export const TreeSelector: React.FC<TreeSelectorProps> = ({
 	treeData = [],
 	placeholder = "请选择",
 	disabled = false,
-		renderTrigger,
+	renderTrigger,
 	width = 820,
 }) => {
 	// 弹窗状态
@@ -386,59 +386,62 @@ export const TreeSelector: React.FC<TreeSelectorProps> = ({
 					/>
 
 					{/* 左右布局 */}
-					<div className="gap-5 min-h-0 grid grid-cols-2 max-md:grid-cols-1">
-						{/* 左侧树 */}
-						<Card
-							classNames={{
-								header: "!bg-[var(--ant-color-bg-layout)]",
-							}}
-							styles={{
-								body: {
-									padding: 12,
-									overflow: "auto",
-									maxHeight: "400px",
-								},
-							}}
-							title={
-								<div className="flex justify-between items-center">
-									<span className="text-base">列表选择区域</span>
-									<Button type="link" size="small" onClick={handleSelectAll}>
-										{isAllSelected ? "取消全选" : "全选"}
-									</Button>
-								</div>
-							}
-						>
-							{filteredTreeData.length === 0 ? (
-								<div className="text-gray-400 text-center py-12">
-									无匹配结果
-								</div>
-							) : (
-								<Tree
-									checkable
-									checkStrictly
-									checkedKeys={modalCheckedKeys}
-									onCheck={handleTreeCheck as any}
-									treeData={filteredTreeData as any}
-									expandedKeys={expandedKeys}
-									onExpand={(keys) => setExpandedKeys(keys as React.Key[])}
-									fieldNames={{
-										key: "value",
-										title: "title",
-										children: "children",
-									}}
-									titleRender={renderTreeNode as any}
-								/>
-							)}
-						</Card>
+					<div className="gap-5 min-h-0 grid grid-cols-10 max-md:grid-cols-1">
+						<div className={"col-span-6"}>
+							{/* 左侧树 */}
+							<Card
+								classNames={{
+									header: "!bg-[var(--ant-color-bg-layout)]",
+								}}
+								styles={{
+									body: {
+										padding: 12,
+										overflow: "auto",
+										maxHeight: "400px",
+									},
+								}}
+								title={
+									<div className="flex justify-between items-center">
+										<span className="text-base">列表选择区域</span>
+										<Button type="link" size="small" onClick={handleSelectAll}>
+											{isAllSelected ? "取消全选" : "全选"}
+										</Button>
+									</div>
+								}
+							>
+								{filteredTreeData.length === 0 ? (
+									<div className="text-gray-400 text-center py-12">
+										无匹配结果
+									</div>
+								) : (
+									<Tree
+										checkable
+										checkStrictly
+										checkedKeys={modalCheckedKeys}
+										onCheck={handleTreeCheck as any}
+										treeData={filteredTreeData as any}
+										expandedKeys={expandedKeys}
+										onExpand={(keys) => setExpandedKeys(keys as React.Key[])}
+										fieldNames={{
+											key: "value",
+											title: "title",
+											children: "children",
+										}}
+										titleRender={renderTreeNode as any}
+									/>
+								)}
+							</Card>
+						</div>
 
-						{/* 右侧已选列表 */}
-						<SelectedPanel
-							selectedItems={modalSelected}
-							onRemove={removeSelectedItem as (item: SelectedItem) => void}
-							onClearAll={handleClearAll}
-						/>
+						<div className="col-span-4">
+							{/* 右侧已选列表 */}
+							<SelectedPanel
+								selectedItems={modalSelected}
+								onRemove={removeSelectedItem as (item: SelectedItem) => void}
+								onClearAll={handleClearAll}
+							/>
+						</div>
 					</div>
-
 					{/* 底部操作栏 */}
 					<SelectorFooter
 						selectedCount={modalSelected.length}
