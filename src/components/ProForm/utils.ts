@@ -7,7 +7,7 @@ import type {
 	TimeFieldType,
 	TimeFieldValue,
 	TypedFieldConfig,
-} from "./types";
+} from "./types.d";
 
 /** antd Form.Item name 类型（支持嵌套路径） */
 type FieldName = string | string[];

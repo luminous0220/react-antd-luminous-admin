@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { ListCard, ListItem } from '@/components/Card';
 import { useCalendarStore } from '@/stores';
-import type { CalendarReminder } from '../types';
+import type { CalendarReminder } from '../types.d';
 
 const { Text } = Typography;
 

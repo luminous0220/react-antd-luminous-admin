@@ -1,5 +1,5 @@
 import { Card, Typography } from "antd";
-import { NormalCardProps } from "../types";
+import { NormalCardProps } from "../types.d";
 
 export const NormalCard: React.FC<NormalCardProps> = ({
 	icon,

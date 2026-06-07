@@ -3,7 +3,7 @@ import type {
 	ProTableColumnType,
 	ProTableColumnConfig,
 	ProTableColumnFixed,
-} from "./types";
+} from "./types.d";
 
 /** 默认分页大小 */
 export const DEFAULT_PAGE_SIZE = 20;

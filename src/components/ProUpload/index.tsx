@@ -5,7 +5,7 @@ import { IconUpload } from "@tabler/icons-react";
 import { UploadProps } from "antd/lib";
 import React from "react";
 import axios, { AxiosProgressEvent } from "axios";
-import { ProUploadProps } from "./types";
+import { ProUploadProps } from "./types.d";
 
 // 图片类型 MIME 对应表
 const IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png"];
@@ -241,4 +241,4 @@ const ProUpload_ = (props: ProUploadProps) => {
 };
 
 export const ProUpload = React.memo(ProUpload_);
-export * from "./types";
+export * from "./types.d";

@@ -162,6 +162,7 @@ export const TreeSelector: React.FC<TreeSelectorProps> = ({
 	treeData = [],
 	placeholder = "请选择",
 	disabled = false,
+		renderTrigger,
 	width = 820,
 }) => {
 	// 弹窗状态
@@ -360,6 +361,7 @@ export const TreeSelector: React.FC<TreeSelectorProps> = ({
 				disabled={disabled}
 				onOpen={handleOpen}
 				onRemoveTag={removeTag}
+				renderTrigger={renderTrigger}
 			/>
 
 			{/* 弹窗 */}

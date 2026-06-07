@@ -1,5 +1,5 @@
 import { memo, forwardRef } from "react";
-import type { ProTableProps, ProTableInstance } from "./types";
+import type { ProTableProps, ProTableInstance } from "./types.d";
 import { ProTableInner } from "./components/ProTableInner";
 
 /**
@@ -12,5 +12,5 @@ export const ProTable = memo(forwardRef(ProTableInner)) as <T extends object>(
 
 export type { ProTableInstance };
 
-export * from "./types";
+export * from "./types.d";
 export * from "./CopyableCell";

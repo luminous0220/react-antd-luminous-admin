@@ -15,7 +15,7 @@ import type {
 	ProTableColumnType,
 	ProTablePagination,
 } from "@/components/ProTable";
-import type { ProTableSearchConfig } from "@/components/ProTable/types";
+import type { ProTableSearchConfig } from "@/components/ProTable";
 
 // ==================== TreeSelector 演示数据 ====================
 
@@ -235,6 +235,13 @@ const SelectorDemo: React.FC = () => {
 	}, []);
 
 	// TableSelector 单选
+
+	// TableSelector 自定义触发器状态
+	const [employeeCustomSelected, setEmployeeCustomSelected] = useState<TableSelectorNode[]>([]);
+	const handleEmployeeCustomChange = useCallback((selected: TableSelectorNode[]) => {
+		setEmployeeCustomSelected(selected);
+		window.$message?.success?.(`已选择: ${selected.map((s) => s.title).join("、")}`);
+	}, []);
 	const [employeeRadioSelected, setEmployeeRadioSelected] = useState<
 		TableSelectorNode[]
 	>([]);
@@ -314,6 +321,32 @@ const SelectorDemo: React.FC = () => {
 					打开员工列表
 				</Button>
 				<TableModalView<EmployeeRow> ref={tableViewRef} title="员工列表" />
+			</Card>
+
+			<Card title="案例五：表格选择器（自定义触发器）">
+				<p className="text-gray-500 text-sm mb-4">
+					通过 renderTrigger 自定义触发器为 Button，显示已选数量。点击按钮打开弹窗进行选择。
+				</p>
+				<TableSelector<EmployeeRow>
+					title="选择员工"
+					api={fetchEmployees}
+					columns={EMPLOYEE_COLUMNS}
+					checkedKeys={employeeCustomSelected}
+					onChange={handleEmployeeCustomChange}
+					placeholder="请选择员工"
+					search={EMPLOYEE_SEARCH_CONFIG}
+					renderTrigger={(props) => (
+						<Button
+							type={props.selectedItems.length > 0 ? "primary" : "default"}
+							onClick={props.onClick}
+							disabled={props.disabled}
+						>
+							{props.selectedItems.length > 0
+								? `已选 ${props.selectedItems.length} 人`
+								: "点击选择员工"}
+						</Button>
+					)}
+				/>
 			</Card>
 		</div>
 	);

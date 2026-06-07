@@ -7,7 +7,7 @@ import {
 	IconDownload,
 } from "@tabler/icons-react";
 import type { MenuProps } from "antd";
-import type { ProTableDensity, ProTableToolbarProps } from "../types";
+import type { ProTableDensity, ProTableToolbarProps } from "../types.d";
 import { TableDragSort } from "./TableDragSort";
 
 export const Toolbar = memo(function Toolbar({

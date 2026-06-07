@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import ReactECharts from "echarts-for-react";
 import { Card } from "antd";
-import type { ChartProps } from "./types";
+import type { ChartProps } from "./types.d";
 import { useChartColors } from "@/hooks/useChartColors";
 import { mergeOptions } from "./utils";
 
@@ -45,4 +45,4 @@ export const Chart: React.FC<ChartProps> = ({
 };
 
 export * from "./utils.ts";
-export type { ChartProps, ChartColorSet, ChartType } from "./types";
+export type { ChartProps, ChartColorSet, ChartType } from "./types.d";

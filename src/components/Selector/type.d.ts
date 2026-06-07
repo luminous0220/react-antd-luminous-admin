@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 /** 树节点原始数据 */
 export interface TreeNodeData {
 	value: number | string;
@@ -6,6 +8,19 @@ export interface TreeNodeData {
 	info?: string;
 	children?: TreeNodeData[];
 	[key: string]: any;
+}
+
+/** 自定义触发器渲染参数 */
+export interface SelectorTriggerRenderProps<
+	T extends { value: number | string; title: string } = {
+		value: number | string;
+		title: string;
+	},
+> {
+	selectedItems: T[];
+	placeholder: string;
+	disabled: boolean;
+	onClick: () => void;
 }
 
 /** 已选节点 */
@@ -33,6 +48,8 @@ export interface TreeSelectorProps {
 	disabled?: boolean;
 	/** 弹窗宽度，默认 1220 */
 	width?: number;
+	/** 自定义触发器，传入后替换默认 Tag 触发器 */
+	renderTrigger?: (props: SelectorTriggerRenderProps<TreeSelectorNode>) => ReactNode;
 }
 
 /** 表格已选行 */
@@ -72,4 +89,6 @@ export interface TableSelectorProps<T = Record<string, any>> extends Omit<
 	labelKey?: string;
 	/** 行数据中描述字段名，默认 "desc" */
 	descKey?: string;
+	/** 自定义触发器，传入后替换默认 Tag 触发器 */
+	renderTrigger?: (props: SelectorTriggerRenderProps<TableSelectorNode>) => ReactNode;
 }

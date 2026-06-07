@@ -1,7 +1,7 @@
 // src/components/Chart/utils.ts
 import merge from "lodash/merge";
 import type { EChartsOption } from "echarts";
-import { ChartColorSet } from "./types";
+import { ChartColorSet } from "./types.d";
 
 export const CHART_COLORS = [
 	"#FFF6DE",

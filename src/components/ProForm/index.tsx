@@ -5,7 +5,7 @@ import type {
 	TypedFieldConfig,
 	ComponentType,
 	ProFormInstance,
-} from "./types";
+} from "./types.d";
 import {
 	getFieldKey,
 	formatTimeFields,
@@ -366,4 +366,4 @@ export type {
 	ProFormInstance,
 	ProFormMode,
 	FormValues,
-} from "./types";
+} from "./types.d";

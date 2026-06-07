@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, Typography, Progress } from "antd";
 import CountUp from "react-countup";
-import { ProgressCardProps } from "../types";
+import { ProgressCardProps } from "../types.d";
 
 export const ProgressCard: React.FC<ProgressCardProps> = ({
 	title,

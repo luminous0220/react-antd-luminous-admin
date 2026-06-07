@@ -22,7 +22,7 @@ import { useAuthStore } from "@/stores";
 import { useThemeStore } from "@/stores";
 import { DEFAULT_REMINDER_COLOR, WEEKDAYS, COLOR_OPTIONS } from "./utils";
 import { buildCalendarDays } from "./utils";
-import type { CalendarReminder } from "./types";
+import type { CalendarReminder } from "./types.d";
 import { ProForm } from "@/components/ProForm";
 import type { ProFormInstance } from "@/components/ProForm";
 import "./index.scss";

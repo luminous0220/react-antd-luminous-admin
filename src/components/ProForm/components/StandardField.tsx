@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Form } from "antd";
 import type { FormInstance } from "antd";
-import type { TypedFieldConfig, ComponentType, FormValues } from "../types";
+import type { TypedFieldConfig, ComponentType, FormValues } from "../types.d";
 import { isVisible, isDisabled, normFile, isCustomField } from "../utils";
 import { ProUpload, type ProUploadProps } from "../../ProUpload";
 import { renderControl } from "./renderControl";

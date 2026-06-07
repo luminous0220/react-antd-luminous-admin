@@ -12,15 +12,6 @@ interface RowContextProps {
 
 const RowContext = createContext<RowContextProps>({});
 
-
-
-interface RowContextProps {
-	setActivatorNodeRef?: (element: HTMLElement | null) => void;
-	listeners?: SyntheticListenerMap;
-}
-
-const RowContext = createContext<RowContextProps>({});
-
 export const DragHandle: React.FC = () => {
 	const { setActivatorNodeRef, listeners } = useContext(RowContext);
 	return (
@@ -78,4 +69,3 @@ export const SortableRow: React.FC<SortableRowProps> = (props) => {
 		</RowContext.Provider>
 	);
 };
-

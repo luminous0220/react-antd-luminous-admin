@@ -10,7 +10,7 @@ import {
 	DeleteOutlined,
 } from "@ant-design/icons";
 import { isToday, isOtherMonth, isOverdue } from "../utils";
-import type { CalendarReminder } from "../types";
+import type { CalendarReminder } from "../types.d";
 
 interface CalendarCellProps {
 	date: Dayjs;

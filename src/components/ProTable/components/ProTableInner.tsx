@@ -10,7 +10,7 @@ import type {
 	ProTableDensity,
 	ProTablePagination,
 	ProTableInstance,
-} from "../types";
+} from "../types.d";
 import {
 	DEFAULT_PAGE_SIZE,
 	PAGE_SIZE_OPTIONS,

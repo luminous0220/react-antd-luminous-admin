@@ -3,7 +3,7 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import CountUp from "react-countup";
 import { useSparklineOption } from "../hooks/useSparkline";
 import { useEcharts } from "@/hooks";
-import { StatCardProps } from "../types";
+import { StatCardProps } from "../types.d";
 
 export const StatCard: React.FC<StatCardProps> = ({ data, colors }) => {
 	const sparklineColor = data.sparklineColor || colors.primary;

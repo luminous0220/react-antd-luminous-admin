@@ -1,5 +1,5 @@
 import dayjs, { type Dayjs } from "dayjs";
-import type { CalendarReminder } from "./types";
+import type { CalendarReminder } from "./types.d";
 
 export const COLOR_OPTIONS = [
 	{ label: "红色", value: "#ff4d4f" },

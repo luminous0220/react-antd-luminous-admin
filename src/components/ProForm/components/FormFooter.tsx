@@ -1,6 +1,6 @@
 import { Button, Form } from "antd";
 import { memo } from "react";
-import type { ProFormProps } from "../types";
+import type { ProFormProps } from "../types.d";
 
 /** Footer 按钮组件（重置 + 确认） */
 export const FormFooter = memo(function FormFooter({

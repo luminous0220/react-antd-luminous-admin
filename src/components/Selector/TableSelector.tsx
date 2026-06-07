@@ -26,6 +26,7 @@ export function TableSelector<
 	disabled = false,
 	width = 1280,
 	selectionType = "checkbox",
+		renderTrigger,
 	// ---- ProTable props ----
 	columns = [],
 	rowKey = "id",
@@ -157,6 +158,7 @@ export function TableSelector<
 				disabled={disabled}
 				onOpen={handleOpen}
 				onRemoveTag={removeTag}
+				renderTrigger={renderTrigger}
 			/>
 
 			{/* 弹窗 */}

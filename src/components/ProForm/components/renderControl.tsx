@@ -9,7 +9,7 @@ import {
 	DatePicker,
 	TimePicker,
 } from "antd";
-import type { ComponentType } from "../types";
+import type { ComponentType } from "../types.d";
 
 /** 渲染单个表单控件 */
 export function renderControl(

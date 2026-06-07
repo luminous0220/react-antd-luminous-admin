@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Tag, Space } from "antd";
 import { IconChevronDown } from "@tabler/icons-react";
 
@@ -5,6 +6,16 @@ import { IconChevronDown } from "@tabler/icons-react";
 export interface SelectorTriggerItem {
 	value: number | string;
 	title: string;
+}
+
+/** 自定义触发器渲染参数 */
+export interface SelectorTriggerRenderProps<
+	T extends SelectorTriggerItem = SelectorTriggerItem,
+> {
+	selectedItems: T[];
+	placeholder: string;
+	disabled: boolean;
+	onClick: () => void;
 }
 
 /** SelectorTrigger Props */
@@ -21,11 +32,15 @@ export interface SelectorTriggerProps<
 	onOpen: () => void;
 	/** Tag 删除回调，接收原始 item */
 	onRemoveTag: (item: T) => void;
+	/**
+	 * 自定义触发器，传入后替换默认 Tag 触发器
+	 * 典型用法：renderTrigger={(props) => <Button onClick={props.onClick}>选择</Button>}
+	 */
+	renderTrigger?: (props: SelectorTriggerRenderProps<T>) => ReactNode;
 }
 
 /**
- * @description 选择器触发器 — 模拟输入框样式，展示已选 Tag、计数、下拉图标
- * TreeSelector 和 TableSelector 共用
+ * @description 选择器触发器 — 默认展示 Tag + 计数 + 下拉图标，支持自定义触发器
  */
 export function SelectorTrigger<T extends SelectorTriggerItem = SelectorTriggerItem>({
 	selectedItems,
@@ -33,7 +48,23 @@ export function SelectorTrigger<T extends SelectorTriggerItem = SelectorTriggerI
 	disabled,
 	onOpen,
 	onRemoveTag,
+	renderTrigger,
 }: SelectorTriggerProps<T>) {
+	// 自定义触发器
+	if (renderTrigger) {
+		return (
+			<>
+				{renderTrigger({
+					selectedItems,
+					placeholder,
+					disabled,
+					onClick: onOpen,
+				})}
+			</>
+		);
+	}
+
+	// 默认触发器
 	return (
 		<div
 			className={`border border-[var(--ant-color-border)] rounded-lg px-3 py-1.5 flex items-center gap-2

@@ -1,7 +1,7 @@
 import { Button } from "antd";
 import { useThemeStore } from "@/stores";
 import "./index.scss";
-import { BannerProps } from "./types";
+import { BannerProps } from "./types.d";
 import { PRESETS } from "./utils";
 
 export const Banner: React.FC<BannerProps> = ({
@@ -97,4 +97,4 @@ export const Banner: React.FC<BannerProps> = ({
 	);
 };
 
-export * from "./types";
+export * from "./types.d";

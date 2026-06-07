@@ -19,7 +19,7 @@ import type {
 	ProTableColumnConfig,
 	ProTableColumnFixed,
 	ProTableColumnType,
-} from "../types";
+} from "../types.d";
 
 // ---- 拖拽手柄 Context ----
 

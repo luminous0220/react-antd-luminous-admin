@@ -1,6 +1,6 @@
 import type { TableProps, TableColumnType } from "antd";
 import type { ReactNode } from "react";
-import type { ProFormFields, FormValues } from "@/components/ProForm/types";
+import type { ProFormFields, FormValues } from "@/components/ProForm/types.d";
 
 /** API 返回数据结构 */
 export interface ProTableApiResult<T> {

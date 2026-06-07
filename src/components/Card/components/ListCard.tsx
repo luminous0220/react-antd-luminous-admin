@@ -1,5 +1,5 @@
 import { Card, Typography } from "antd";
-import type { ListCardProps, ListItemProps } from "../types";
+import type { ListCardProps, ListItemProps } from "../types.d";
 
 const CARD_STYLE = { borderRadius: 12 };
 const ICON_SIZE = 36;
