@@ -1,10 +1,18 @@
-import { useState, useCallback, useMemo, useEffect, forwardRef, useImperativeHandle } from "react";
-import { Tree, Input, Button, Card } from "antd";
+import { useState, useCallback, useMemo, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
+import { Tree, Input, Button, Card, Spin } from "antd";
 import { IconSearch } from "@tabler/icons-react";
 import { ProModal } from "@/components/ProModal";
-import { SelectedPanel, type SelectedItem } from "./components/SelectedPanel";
+import { SelectedPanel } from "./components/SelectedPanel";
 import { SelectorFooter } from "./components/SelectorFooter";
-import type { TreeNodeData, TreeSelectorNode } from "./types";
+import type {
+	TreeNodeData,
+	TreeSelectorNode,
+	SelectedItem,
+	TreeSelectorApi,
+	TreeSelectorModalOpenProps,
+	TreeSelectorModalRef,
+	TreeSelectorModalProps,
+} from "./types";
 import {
 	getDescendantKeys,
 	findNode,
@@ -12,37 +20,24 @@ import {
 	filterTree,
 	getMatchedAncestorKeys,
 	buildSelectedFromKeys,
-} from "./treeUtils";
+} from "./utils";
 
-/** open() 可传入的参数 */
-export interface TreeSelectorModalOpenProps {
-	title?: string;
-	treeData?: TreeNodeData[];
-	checkedKeys?: TreeSelectorNode[];
-}
-
-/** TreeSelectorModal 实例方法 */
-export interface TreeSelectorModalRef {
-	open: (props: TreeSelectorModalOpenProps) => void;
-	close: () => void;
-}
-
-/** TreeSelectorModal Props */
-export interface TreeSelectorModalProps {
-	title?: string;
-	treeData?: TreeNodeData[];
-	width?: number;
-	onConfirm?: (selected: TreeSelectorNode[]) => void;
-}
+export type {
+	TreeSelectorModalOpenProps,
+	TreeSelectorModalRef,
+	TreeSelectorModalProps,
+} from "./types";
 
 /**
  * @description TreeSelectorModal 树形选择弹窗（无触发器，编程式控制）
+ * 支持 treeData 静态数据或 api 动态获取数据。
  * 通过 ref.open(props) 打开弹窗并渲染 Tree，ref.close() 关闭。
  */
 function TreeSelectorModalInner(
 	{
 		title: defaultTitle = "选择经营区域",
 		treeData: externalTreeData = [],
+		api: defaultApi,
 		width = 820,
 		onConfirm,
 	}: TreeSelectorModalProps,
@@ -54,6 +49,35 @@ function TreeSelectorModalInner(
 	const [expandedKeys, setExpandedKeys] = useState<React.Key[]>([]);
 	const [treeData, setTreeData] = useState<TreeNodeData[]>(externalTreeData);
 	const [modalTitle, setModalTitle] = useState(defaultTitle);
+	const [loading, setLoading] = useState(false);
+	const apiRef = useRef<TreeSelectorApi | null>(null);
+
+	// 同步 api prop 到 ref
+	useEffect(() => {
+		apiRef.current = defaultApi ?? null;
+	}, [defaultApi]);
+
+	// 重置树数据
+	const resetTreeData = useCallback((data: TreeNodeData[]) => {
+		setTreeData(data);
+		setExpandedKeys([]);
+	}, []);
+
+	// 请求数据
+	const fetchData = useCallback(
+		async (api: TreeSelectorApi) => {
+			setLoading(true);
+			try {
+				const result = await api();
+				if (result && Array.isArray(result)) {
+					setTreeData(result);
+				}
+			} finally {
+				setLoading(false);
+			}
+		},
+		[],
+	);
 
 	const modalSelected = useMemo<TreeSelectorNode[]>(
 		() => buildSelectedFromKeys(modalCheckedKeys, treeData),
@@ -172,8 +196,8 @@ function TreeSelectorModalInner(
 		return (
 			<div className="flex items-center gap-2 py-0.5">
 				<span className="text-sm">{nodeData.title}</span>
-				{nodeData.desc && (
-					<span className="text-xs text-gray-400">— {nodeData.desc}</span>
+				{nodeData.info && (
+					<span className="text-xs text-gray-400">— {nodeData.info}</span>
 				)}
 			</div>
 		);
@@ -181,19 +205,27 @@ function TreeSelectorModalInner(
 
 	const open = useCallback(
 		(props: TreeSelectorModalOpenProps) => {
-			const td = props.treeData ?? externalTreeData;
-			setTreeData(td);
 			setModalTitle(props.title ?? defaultTitle);
+			setSearchText("");
+
+			// 恢复已选状态
 			if (props.checkedKeys?.length) {
 				setModalCheckedKeys(props.checkedKeys.map((item) => item.value));
 			} else {
 				setModalCheckedKeys([]);
 			}
-			setSearchText("");
-			setExpandedKeys([]);
+
 			setIsOpen(true);
+
+			// 优先使用 api 获取数据，其次使用 treeData
+			if (apiRef.current) {
+				fetchData(apiRef.current);
+			} else {
+				const td = props.treeData ?? externalTreeData;
+				resetTreeData(td);
+			}
 		},
-		[externalTreeData, defaultTitle],
+		[externalTreeData, defaultTitle, fetchData, resetTreeData],
 	);
 
 	const close = useCallback(() => setIsOpen(false), []);
@@ -234,21 +266,25 @@ function TreeSelectorModalInner(
 								</div>
 							}
 						>
-							{filteredTreeData.length === 0 ? (
-								<div className="text-gray-400 text-center py-12">无匹配结果</div>
-							) : (
-								<Tree
-									checkable
-									checkStrictly
-									checkedKeys={modalCheckedKeys}
-									onCheck={handleTreeCheck as any}
-									treeData={filteredTreeData as any}
-									expandedKeys={expandedKeys}
-									onExpand={(keys) => setExpandedKeys(keys as React.Key[])}
-									fieldNames={{ key: "value", title: "title", children: "children" }}
-									titleRender={renderTreeNode as any}
-								/>
-							)}
+							<Spin spinning={loading}>
+								{filteredTreeData.length === 0 ? (
+									<div className="text-gray-400 text-center py-12">
+										{loading ? "加载中..." : "无匹配结果"}
+									</div>
+								) : (
+									<Tree
+										checkable
+										checkStrictly
+										checkedKeys={modalCheckedKeys}
+										onCheck={handleTreeCheck as any}
+										treeData={filteredTreeData as any}
+										expandedKeys={expandedKeys}
+										onExpand={(keys) => setExpandedKeys(keys as React.Key[])}
+										fieldNames={{ key: "value", title: "title", children: "children" }}
+										titleRender={renderTreeNode as any}
+									/>
+								)}
+							</Spin>
 						</Card>
 					</div>
 

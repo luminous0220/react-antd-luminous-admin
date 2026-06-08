@@ -10,29 +10,22 @@ import {
 import { Checkbox, Input, Button, Card, Spin, Pagination } from "antd";
 import { IconSearch } from "@tabler/icons-react";
 import { ProModal } from "@/components/ProModal";
-import { SelectedPanel, type SelectedItem } from "./components/SelectedPanel";
+import { SelectedPanel } from "./components/SelectedPanel";
 import { SelectorFooter } from "./components/SelectorFooter";
-import type { ListItemData, ListSelectorNode, ListSelectorApi } from "./types";
+import type {
+	ListItemData,
+	ListSelectorNode,
+	ListSelectorApi,
+	ListSelectorModalOpenProps,
+	ListSelectorModalRef,
+	ListSelectorModalProps,
+} from "./types";
 
-/** open() 可传入的参数 */
-export interface ListSelectorModalOpenProps {
-	title?: string;
-	api: ListSelectorApi;
-	checkedKeys?: ListSelectorNode[];
-}
-
-/** ListSelectorModal 实例方法 */
-export interface ListSelectorModalRef {
-	open: (props: ListSelectorModalOpenProps) => void;
-	close: () => void;
-}
-
-/** ListSelectorModal Props */
-export interface ListSelectorModalProps {
-	title?: string;
-	width?: number;
-	onConfirm?: (selected: ListSelectorNode[]) => void;
-}
+export type {
+	ListSelectorModalOpenProps,
+	ListSelectorModalRef,
+	ListSelectorModalProps,
+} from "./types";
 
 const PAGE_SIZE = 20;
 
@@ -45,13 +38,15 @@ function ListSelectorModalInner(
 	{
 		title: defaultTitle = "选择数据",
 		width = 820,
+		api: defaultApi,
 		onConfirm,
 	}: ListSelectorModalProps,
 	ref: React.ForwardedRef<ListSelectorModalRef>,
 ) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [searchText, setSearchText] = useState("");
-	const [modalCheckedKeys, setModalCheckedKeys] = useState<React.Key[]>([]);
+	// 已选项列表（单一状态源，跨页保留）
+	const [selectedItems, setSelectedItems] = useState<ListSelectorNode[]>([]);
 	const [data, setData] = useState<ListItemData[]>([]);
 	const [total, setTotal] = useState(0);
 	const [page, setPage] = useState(1);
@@ -60,27 +55,20 @@ function ListSelectorModalInner(
 	const apiRef = useRef<ListSelectorApi | null>(null);
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-	const modalSelected = useMemo<ListSelectorNode[]>(() => {
-		return modalCheckedKeys
-			.map((k) => data.find((d) => d.value === k))
-			.filter(Boolean)
-			.map((item) => ({
-				value: item!.value,
-				title: item!.title,
-				desc: item!.desc,
-			}));
-	}, [modalCheckedKeys, data]);
+	// 同步 api prop 到 ref
+	useEffect(() => {
+		apiRef.current = defaultApi ?? null;
+	}, [defaultApi]);
 
-	const allKeys = useMemo<React.Key[]>(
-		() => data.map((item) => item.value),
-		[data],
-	);
+	// 当前页已选 key 集合（用于 Checkbox checked 判断）
+	const checkedKeySet = useMemo<Set<React.Key>>(() => {
+		return new Set(selectedItems.map((item) => item.value));
+	}, [selectedItems]);
 
+	// 当前页全选状态
 	const isAllSelected = useMemo(
-		() =>
-			data.length > 0 &&
-			data.every((item) => modalCheckedKeys.includes(item.value)),
-		[data, modalCheckedKeys],
+		() => data.length > 0 && data.every((item) => checkedKeySet.has(item.value)),
+		[data, checkedKeySet],
 	);
 
 	// 请求数据
@@ -137,59 +125,62 @@ function ListSelectorModalInner(
 	const handleCancel = useCallback(() => setIsOpen(false), []);
 
 	const handleConfirm = useCallback(() => {
-		const selected = modalCheckedKeys
-			.map((k) => data.find((d) => d.value === k))
-			.filter(Boolean)
-			.map((item) => ({
-				value: item!.value,
-				title: item!.title,
-				desc: item!.desc,
-			}));
-		onConfirm?.(selected);
+		onConfirm?.(selectedItems);
 		setIsOpen(false);
-	}, [modalCheckedKeys, data, onConfirm]);
+	}, [selectedItems, onConfirm]);
 
-	const handleClearAll = useCallback(() => setModalCheckedKeys([]), []);
+	const handleClearAll = useCallback(() => setSelectedItems([]), []);
 
 	const removeSelectedItem = useCallback((item: ListSelectorNode) => {
-		setModalCheckedKeys((prev) => prev.filter((k) => k !== item.value));
+		setSelectedItems((prev) => prev.filter((s) => s.value !== item.value));
 	}, []);
 
 	const handleSelectAll = useCallback(() => {
 		if (isAllSelected) {
+			// 取消全选：移除当前页所有项
 			const keySet = new Set(data.map((d) => d.value));
-			setModalCheckedKeys((prev) => prev.filter((k) => !keySet.has(k as any)));
+			setSelectedItems((prev) => prev.filter((s) => !keySet.has(s.value)));
 		} else {
-			setModalCheckedKeys((prev) => {
-				const keySet = new Set(prev);
-				for (const key of allKeys) keySet.add(key);
-				return Array.from(keySet);
-			});
+			// 全选：合并当前页（已有项保留，仅新增未选的）
+			const existingKeys = new Set(selectedItems.map((s) => s.value));
+			const newItems = data
+				.filter((d) => !existingKeys.has(d.value))
+				.map((d) => ({ value: d.value, title: d.title, desc: d.desc }));
+			setSelectedItems((prev) => [...prev, ...newItems]);
 		}
-	}, [isAllSelected, allKeys, data]);
+	}, [isAllSelected, data, selectedItems]);
 
 	const handleCheckboxChange = useCallback(
-		(value: React.Key, checked: boolean) => {
-			setModalCheckedKeys((prev) =>
-				checked ? [...prev, value] : prev.filter((k) => k !== value),
-			);
+		(item: ListItemData, checked: boolean) => {
+			if (checked) {
+				setSelectedItems((prev) => {
+					if (prev.some((s) => s.value === item.value)) return prev;
+					return [...prev, { value: item.value, title: item.title, desc: item.desc }];
+				});
+			} else {
+				setSelectedItems((prev) => prev.filter((s) => s.value !== item.value));
+			}
 		},
 		[],
 	);
 
 	const open = useCallback(
 		(props: ListSelectorModalOpenProps) => {
-			apiRef.current = props.api;
 			setModalTitle(props.title ?? defaultTitle);
 			setSearchText("");
-			setPage(1);
-			if (props.checkedKeys?.length) {
-				setModalCheckedKeys(props.checkedKeys.map((item) => item.value));
-			} else {
-				setModalCheckedKeys([]);
-			}
-			fetchData(props.api, 1, "");
+			setSelectedItems(props.checkedKeys ?? []);
 			setIsOpen(true);
+
+			// 优先使用静态数据，其次使用 api 获取
+			if (props.data) {
+				setData(props.data);
+				setTotal(props.data.length);
+				setPage(1);
+				setLoading(false);
+			} else if (apiRef.current) {
+				setPage(1);
+				fetchData(apiRef.current, 1, "");
+			}
 		},
 		[defaultTitle, fetchData],
 	);
@@ -218,81 +209,74 @@ function ListSelectorModalInner(
 					size="large"
 				/>
 
-				<div className="gap-5 min-h-0 grid grid-cols-2 max-md:grid-cols-1">
-					<Card
-						classNames={{ header: "!bg-[var(--ant-color-bg-layout)]" }}
-						styles={{
-							body: { padding: 12, overflow: "auto", maxHeight: "400px" },
-						}}
-						title={
-							<div className="flex justify-between items-center">
-								<span className="text-base">列表选择区域</span>
-								<Button type="link" size="small" onClick={handleSelectAll}>
-									{isAllSelected ? "取消全选" : "全选"}
-								</Button>
-							</div>
-						}
-					>
-						<Spin spinning={loading}>
-							{data.length === 0 ? (
-								<div className="text-gray-400 text-center py-12">暂无数据</div>
-							) : (
-								<div className="flex flex-col gap-1">
-									{data.map((item) => (
-										<div
-											key={item.value}
-											className="flex items-center gap-2 py-1.5 px-1 rounded
-												hover:bg-[var(--ant-color-bg-layout)] transition-colors cursor-pointer"
-											onClick={() =>
-												handleCheckboxChange(
-													item.value,
-													!modalCheckedKeys.includes(item.value),
-												)
-											}
-										>
-											<Checkbox
-												checked={modalCheckedKeys.includes(item.value)}
-												onChange={(e) =>
-													handleCheckboxChange(item.value, e.target.checked)
-												}
-												onClick={(e) => e.stopPropagation()}
-											/>
-											<div className="flex items-center gap-2 min-w-0">
-												<span className="text-sm truncate">{item.title}</span>
-												{item.desc && (
-													<span className="text-xs text-gray-400 truncate">
-														— {item.desc}
-													</span>
-												)}
+				<div className="gap-5 min-h-0 grid grid-cols-10 max-md:grid-cols-1">
+					<div className="col-span-6">
+						<Card
+							classNames={{ header: "!bg-[var(--ant-color-bg-layout)]" }}
+							styles={{ body: { padding: 12, overflow: "auto", maxHeight: "400px" } }}
+							title={
+								<div className="flex justify-between items-center">
+									<span className="text-base">列表选择区域</span>
+									<Button type="link" size="small" onClick={handleSelectAll}>
+										{isAllSelected ? "取消全选" : "全选"}
+									</Button>
+								</div>
+							}
+						>
+							<Spin spinning={loading}>
+								{data.length === 0 ? (
+									<div className="text-gray-400 text-center py-12">暂无数据</div>
+								) : (
+									<div className="flex flex-col gap-1">
+										{data.map((item) => (
+											<div
+												key={item.value}
+												className="flex items-center gap-2 py-1.5 px-1 rounded
+													hover:bg-[var(--ant-color-bg-layout)] transition-colors cursor-pointer"
+												onClick={() => handleCheckboxChange(item, !checkedKeySet.has(item.value))}
+											>
+												<Checkbox
+													checked={checkedKeySet.has(item.value)}
+													onChange={(e) => handleCheckboxChange(item, e.target.checked)}
+													onClick={(e) => e.stopPropagation()}
+												/>
+												<div className="flex items-center gap-2 min-w-0">
+													<span className="text-sm truncate">{item.title}</span>
+													{item.desc && (
+														<span className="text-xs text-gray-400 truncate">— {item.desc}</span>
+													)}
+												</div>
 											</div>
-										</div>
-									))}
+										))}
+									</div>
+								)}
+							</Spin>
+							{total > PAGE_SIZE && (
+								<div className="flex justify-center mt-3">
+									<Pagination
+										current={page}
+										pageSize={PAGE_SIZE}
+										total={total}
+										size="small"
+										showSizeChanger={false}
+										onChange={handlePageChange}
+									/>
 								</div>
 							)}
-						</Spin>
-						{total > PAGE_SIZE && (
-							<div className="flex justify-center mt-3">
-								<Pagination
-									current={page}
-									pageSize={PAGE_SIZE}
-									total={total}
-									size="small"
-									showSizeChanger={false}
-									onChange={handlePageChange}
-								/>
-							</div>
-						)}
-					</Card>
+						</Card>
+					</div>
 
-					<SelectedPanel
-						selectedItems={modalSelected}
-						onRemove={removeSelectedItem as (item: SelectedItem) => void}
-						onClearAll={handleClearAll}
-					/>
+					<div className="col-span-4">
+						<SelectedPanel
+							selectedItems={selectedItems}
+							onRemove={removeSelectedItem}
+							onClearAll={handleClearAll}
+						/>
+					</div>
 				</div>
 
 				<SelectorFooter
-					selectedCount={modalSelected.length}
+					selectedCount={selectedItems.length}
 					onCancel={handleCancel}
 					onConfirm={handleConfirm}
 				/>

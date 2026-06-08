@@ -9,8 +9,7 @@ import {
 	TableSelector,
 	type TableSelectorNode,
 } from "@/components/ModalSelector/TableSelector";
-import { TableModalView } from "@/components/TableModalView";
-import type { TableModalViewRef } from "@/components/TableModalView";
+import { TableModalView, TableModalViewRef } from "@/components/TableModalView";
 import type {
 	ProTableColumnType,
 	ProTablePagination,
@@ -245,7 +244,10 @@ const fetchDepartments: ListSelectorApi = async (params) => {
 		);
 	}
 	const start = (params.pageNumber - 1) * params.pageSize;
-	return { data: list.slice(start, start + params.pageSize), total: list.length };
+	return {
+		data: list.slice(start, start + params.pageSize),
+		total: list.length,
+	};
 };
 const SelectorDemo: React.FC = () => {
 	const tableViewRef = useRef<TableModalViewRef<EmployeeRow>>(null);
@@ -287,7 +289,7 @@ const SelectorDemo: React.FC = () => {
 	}, []);
 
 	return (
-		<div className="flex flex-col gap-4 mb-36">
+		<div className="grid grid-cols-2 gap-4">
 			{/* ====== 选择器案例 ====== */}
 			<Card title="案例一：树形选择器">
 				<p className="text-gray-500 text-sm mb-4">
@@ -330,7 +332,7 @@ const SelectorDemo: React.FC = () => {
 				/>
 			</Card>
 
-			<Card title="案例四：TableModalView 表格弹窗查看">
+			<Card title="案例四: 表格弹窗查看">
 				<p className="text-gray-500 text-sm mb-4">
 					通过 ref.open() 编程式打开弹窗，传入表格参数渲染 ProTable。ref.close()
 					关闭弹窗。
@@ -377,7 +379,7 @@ const SelectorDemo: React.FC = () => {
 				/>
 			</Card>
 
-			<Card title="案例六：ListSelector 列表选择器">
+			<Card title="案例六: 列表选择器">
 				<p className="text-gray-500 text-sm mb-4">
 					演示列表式多选选择器，基于 Checkbox 列表实现。与 TreeSelector
 					结构一致，但数据源为扁平列表（无层级）。

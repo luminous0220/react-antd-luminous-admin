@@ -9,7 +9,7 @@ import type {
 	ProTableColumnConfig,
 	ProTableDensity,
 	ProTablePagination,
-	ProTableInstance,
+	ProTableRef,
 } from "../types.d";
 import {
 	DEFAULT_PAGE_SIZE,
@@ -34,7 +34,7 @@ import { DragHandle, SortableRow } from "./DragSortRow";
 
 export function ProTableInner<T>(
 	props: ProTableProps<T>,
-	ref: React.ForwardedRef<ProTableInstance<T>>,
+	ref: React.ForwardedRef<ProTableRef<T>>,
 ) {
 	const {
 		api,

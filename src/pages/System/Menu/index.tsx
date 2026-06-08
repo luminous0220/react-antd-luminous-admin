@@ -5,7 +5,7 @@ import {
 	ProTable,
 	ProTableColumnType,
 	ProTableProps,
-	ProTableInstance,
+	ProTableRef,
 } from "@/components/ProTable";
 import { ProForm } from "@/components/ProForm";
 import type {
@@ -37,7 +37,7 @@ function renderIcon(iconName: string) {
 
 const Menu: React.FC = () => {
 	const modalRef = useRef<ProFormInstance>(null);
-	const TableRef = useRef<ProTableInstance>(null);
+	const TableRef = useRef<ProTableRef>(null);
 
 	// 新增
 	const openAdd = useCallback(() => {

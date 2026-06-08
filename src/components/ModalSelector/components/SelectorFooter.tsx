@@ -1,14 +1,5 @@
 import { Button, Space } from "antd";
-
-/** SelectorFooter Props */
-export interface SelectorFooterProps {
-	/** 当前已选数量 */
-	selectedCount: number;
-	/** 取消回调 */
-	onCancel: () => void;
-	/** 确认回调 */
-	onConfirm: () => void;
-}
+import type { SelectorFooterProps } from "../types";
 
 /**
  * @description 选择器底部操作栏 — 显示已选数量 + 取消/确定按钮

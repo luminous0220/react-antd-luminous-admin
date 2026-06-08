@@ -1,43 +1,6 @@
-import type { ReactNode } from "react";
 import { Tag, Space } from "antd";
 import { IconChevronDown } from "@tabler/icons-react";
-
-/** 触发器已选项（基础约束） */
-export interface SelectorTriggerItem {
-	value: number | string;
-	title: string;
-}
-
-/** 自定义触发器渲染参数 */
-export interface SelectorTriggerRenderProps<
-	T extends SelectorTriggerItem = SelectorTriggerItem,
-> {
-	selectedItems: T[];
-	placeholder: string;
-	disabled: boolean;
-	onClick: () => void;
-}
-
-/** SelectorTrigger Props */
-export interface SelectorTriggerProps<
-	T extends SelectorTriggerItem = SelectorTriggerItem,
-> {
-	/** 已选数据 */
-	selectedItems: T[];
-	/** 占位文本 */
-	placeholder: string;
-	/** 是否禁用 */
-	disabled: boolean;
-	/** 点击打开弹窗 */
-	onOpen: () => void;
-	/** Tag 删除回调，接收原始 item */
-	onRemoveTag: (item: T) => void;
-	/**
-	 * 自定义触发器，传入后替换默认 Tag 触发器
-	 * 典型用法：renderTrigger={(props) => <Button onClick={props.onClick}>选择</Button>}
-	 */
-	renderTrigger?: (props: SelectorTriggerRenderProps<T>) => ReactNode;
-}
+import type { SelectorTriggerItem, SelectorTriggerProps } from "../types";
 
 /**
  * @description 选择器触发器 — 默认展示 Tag + 计数 + 下拉图标，支持自定义触发器

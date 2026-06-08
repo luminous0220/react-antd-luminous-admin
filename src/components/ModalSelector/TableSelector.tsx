@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { SelectorTrigger } from "./components/SelectorTrigger";
 import {
 	TableSelectorModal,
@@ -11,13 +11,14 @@ export type { TableSelectorNode, TableSelectorProps } from "./types";
 /**
  * @description TableSelector 表格选择器（触发器 + 弹窗）
  * 适合作为表单项使用，自带触发器，点击打开弹窗进行选择。
+ * checkedKeys 不传时为非受控模式，内部维护选中状态。
  * 如需编程式控制弹窗，请使用 TableSelectorModal。
  */
 export function TableSelector<
 	T extends Record<string, any> = Record<string, any>,
 >({
 	title,
-	checkedKeys: controlledCheckedKeys = [],
+	checkedKeys: controlledCheckedKeys,
 	onChange,
 	placeholder = "请选择",
 	disabled = false,
@@ -26,38 +27,43 @@ export function TableSelector<
 	renderTrigger,
 	...restProps
 }: TableSelectorProps<T>) {
-	const modalRef = useRef<TableSelectorModalRef<T>>(null);
+	const isControlled = controlledCheckedKeys !== undefined;
+	const [internalCheckedKeys, setInternalCheckedKeys] = useState<TableSelectorNode[]>(
+		controlledCheckedKeys ?? [],
+	);
+	const currentCheckedKeys = isControlled ? controlledCheckedKeys : internalCheckedKeys;
+
+	const modalRef = useRef<TableSelectorModalRef>(null);
 
 	const handleOpen = useCallback(() => {
 		if (disabled) return;
 		modalRef.current?.open({
 			title,
-			checkedKeys: controlledCheckedKeys,
-			...restProps,
-		} as any);
-	}, [disabled, controlledCheckedKeys, title, restProps]);
+			checkedKeys: currentCheckedKeys,
+		});
+	}, [disabled, currentCheckedKeys, title]);
 
 	const handleConfirm = useCallback(
 		(selected: TableSelectorNode[]) => {
+			if (!isControlled) setInternalCheckedKeys(selected);
 			onChange?.(selected);
 		},
-		[onChange],
+		[isControlled, onChange],
 	);
 
 	const removeTag = useCallback(
 		(item: TableSelectorNode) => {
-			const newSelected = controlledCheckedKeys.filter(
-				(s) => s.value !== item.value,
-			);
+			const newSelected = currentCheckedKeys.filter((s) => s.value !== item.value);
+			if (!isControlled) setInternalCheckedKeys(newSelected);
 			onChange?.(newSelected);
 		},
-		[controlledCheckedKeys, onChange],
+		[currentCheckedKeys, isControlled, onChange],
 	);
 
 	return (
 		<>
 			<SelectorTrigger
-				selectedItems={controlledCheckedKeys}
+				selectedItems={currentCheckedKeys}
 				placeholder={placeholder}
 				disabled={disabled}
 				onOpen={handleOpen}
@@ -70,6 +76,7 @@ export function TableSelector<
 				width={width}
 				selectionType={selectionType}
 				onConfirm={handleConfirm}
+				{...restProps}
 			/>
 		</>
 	);

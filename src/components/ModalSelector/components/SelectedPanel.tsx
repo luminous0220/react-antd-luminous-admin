@@ -1,24 +1,6 @@
 import { Button, Card } from "antd";
 import { IconX } from "@tabler/icons-react";
-
-/** 已选项 */
-export interface SelectedItem {
-	value: number | string;
-	title: string;
-	desc?: string;
-}
-
-/** SelectedPanel Props */
-export interface SelectedPanelProps {
-	className?: string;
-	bodyClassName?: string;
-	/** 已选数据 */
-	selectedItems: SelectedItem[];
-	/** 单项删除回调 */
-	onRemove: (item: SelectedItem) => void;
-	/** 清空全部 */
-	onClearAll: () => void;
-}
+import type { SelectedPanelProps } from "../types";
 
 /**
  * @description 选择器已选面板 — 展示已选项列表，支持单项删除和清空

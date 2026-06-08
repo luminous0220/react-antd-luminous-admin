@@ -1,45 +1,26 @@
 import { useState, useCallback, useMemo, forwardRef, useImperativeHandle } from "react";
 import { ProModal } from "@/components/ProModal";
 import { ProTable } from "@/components/ProTable";
-import type { ProTableColumnType, ProTableProps } from "@/components/ProTable";
+import type { ProTableColumnType } from "@/components/ProTable";
 import { SelectedPanel } from "./components/SelectedPanel";
-import type { SelectedItem } from "./components/SelectedPanel";
 import { SelectorFooter } from "./components/SelectorFooter";
-import type { TableSelectorNode } from "./types";
+import type {
+	TableSelectorNode,
+	TableSelectorModalOpenProps,
+	TableSelectorModalRef,
+	TableSelectorModalProps,
+} from "./types";
 
-/** open() 可传入的参数 */
-export interface TableSelectorModalOpenProps<T = Record<string, any>>
-	extends Omit<
-		ProTableProps<T>,
-		"rowSelection" | "onSelectRows" | "dataSource" | "title"
-	> {
-	/** 弹窗标题 */
-	title?: string;
-	/** 已选数据（用于恢复选中状态） */
-	checkedKeys?: TableSelectorNode[];
-}
-
-/** TableSelectorModal 实例方法 */
-export interface TableSelectorModalRef<T = Record<string, any>> {
-	open: (props: TableSelectorModalOpenProps<T>) => void;
-	close: () => void;
-}
-
-/** TableSelectorModal Props */
-export interface TableSelectorModalProps {
-	/** 默认弹窗标题 */
-	title?: string;
-	/** 弹窗宽度 */
-	width?: number;
-	/** 选择模式 */
-	selectionType?: "checkbox" | "radio";
-	/** 确认回调 */
-	onConfirm?: (selected: TableSelectorNode[]) => void;
-}
+export type {
+	TableSelectorModalOpenProps,
+	TableSelectorModalRef,
+	TableSelectorModalProps,
+} from "./types";
 
 /**
  * @description TableSelectorModal 表格选择弹窗（无触发器，编程式控制）
- * 通过 ref.open(props) 打开弹窗并渲染 ProTable，ref.close() 关闭。
+ * ProTable 配置通过组件 props 传入，checkedKeys 通过 open() 传入。
+ * 通过 ref.open(props) 打开弹窗，ref.close() 关闭。
  */
 function TableSelectorModalInner<T extends Record<string, any> = Record<string, any>>(
 	{
@@ -47,26 +28,21 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 		width = 1280,
 		selectionType = "checkbox",
 		onConfirm,
-	}: TableSelectorModalProps,
-	ref: React.ForwardedRef<TableSelectorModalRef<T>>,
-) {
-	const isRadio = selectionType === "radio";
-
-	const [isOpen, setIsOpen] = useState(false);
-	const [modalCheckedKeys, setModalCheckedKeys] = useState<React.Key[]>([]);
-	const [modalItemCache, setModalItemCache] = useState<Record<string, TableSelectorNode>>({});
-
-	// 当前表格配置（由 open 传入）
-	const [tableConfig, setTableConfig] = useState<TableSelectorModalOpenProps<T>>({});
-
-	const {
-		title: modalTitle,
+		// ProTable 相关 props
 		columns = [],
 		rowKey = "id",
 		labelKey = "name",
 		descKey = "desc",
 		...restTableProps
-	} = tableConfig;
+	}: TableSelectorModalProps<T>,
+	ref: React.ForwardedRef<TableSelectorModalRef>,
+) {
+	const isRadio = selectionType === "radio";
+
+	const [isOpen, setIsOpen] = useState(false);
+	const [modalTitle, setModalTitle] = useState(defaultTitle);
+	const [modalCheckedKeys, setModalCheckedKeys] = useState<React.Key[]>([]);
+	const [modalItemCache, setModalItemCache] = useState<Record<string, TableSelectorNode>>({});
 
 	const modalSelected = useMemo<TableSelectorNode[]>(() => {
 		return modalCheckedKeys.map((k) => modalItemCache[String(k)]).filter(Boolean);
@@ -125,8 +101,8 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 	}, [modalCheckedKeys, selectionType, rowKey, labelKey, descKey]);
 
 	const open = useCallback(
-		(props: TableSelectorModalOpenProps<T>) => {
-			setTableConfig(props);
+		(props: TableSelectorModalOpenProps) => {
+			setModalTitle(props.title ?? defaultTitle);
 			// 恢复已选状态
 			if (props.checkedKeys?.length) {
 				const keys = props.checkedKeys.map((item) => item.value);
@@ -140,7 +116,7 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 			}
 			setIsOpen(true);
 		},
-		[],
+		[defaultTitle],
 	);
 
 	const close = useCallback(() => setIsOpen(false), []);
@@ -160,7 +136,7 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 		<ProModal
 			open={isOpen}
 			onCancel={handleCancel}
-			title={modalTitle ?? defaultTitle}
+			title={modalTitle}
 			width={width}
 			footer={null}
 			destroyOnHidden
@@ -175,7 +151,7 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 							<SelectedPanel
 								bodyClassName="!max-h-[600px]"
 								selectedItems={modalSelected}
-								onRemove={removeSelectedItem as (item: SelectedItem) => void}
+								onRemove={removeSelectedItem}
 								onClearAll={handleClearAll}
 							/>
 						</div>
@@ -194,5 +170,5 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 export const TableSelectorModal = forwardRef(TableSelectorModalInner) as <
 	T extends Record<string, any> = Record<string, any>,
 >(
-	props: TableSelectorModalProps & { ref?: React.Ref<TableSelectorModalRef<T>> },
+	props: TableSelectorModalProps<T> & { ref?: React.Ref<TableSelectorModalRef> },
 ) => React.ReactElement | null;

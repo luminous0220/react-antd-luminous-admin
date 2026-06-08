@@ -100,7 +100,7 @@ export interface ProTableProps<T>
 /**
  * ProTable 暴露给父组件的实例方法（通过 ref 访问）
  */
-export interface ProTableInstance<T = any> {
+export interface ProTableRef<T = any> {
 	/** 手动刷新表格数据 */
 	refresh: () => Promise<void>;
 	/** 获取当前表格数据源 */
