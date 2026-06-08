@@ -1,14 +1,14 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { Button, Card } from "antd";
 import {
 	TreeSelector,
 	type TreeSelectorNode,
 	type TreeNodeData,
-} from "@/components/Selector/TreeSelector";
+} from "@/components/ModalSelector/TreeSelector";
 import {
 	TableSelector,
 	type TableSelectorNode,
-} from "@/components/Selector/TableSelector";
+} from "@/components/ModalSelector/TableSelector";
 import { TableModalView } from "@/components/TableModalView";
 import type { TableModalViewRef } from "@/components/TableModalView";
 import type {
@@ -16,6 +16,12 @@ import type {
 	ProTablePagination,
 } from "@/components/ProTable";
 import type { ProTableSearchConfig } from "@/components/ProTable";
+import {
+	ListSelector,
+	type ListSelectorNode,
+	type ListItemData,
+	type ListSelectorApi,
+} from "@/components/ModalSelector";
 
 // ==================== TreeSelector 演示数据 ====================
 
@@ -212,48 +218,73 @@ const EMPLOYEE_SEARCH_CONFIG: ProTableSearchConfig = {
 	defaultShowCount: 2,
 };
 
+// ==================== ListSelector 演示数据 ====================
+
+const ALL_DEPARTMENTS: ListItemData[] = [
+	{ value: 1, title: "技术部", desc: "负责产品研发与技术架构" },
+	{ value: 2, title: "产品部", desc: "负责需求分析与产品设计" },
+	{ value: 3, title: "设计部", desc: "负责 UI/UX 设计" },
+	{ value: 4, title: "市场部", desc: "负责品牌推广与市场营销" },
+	{ value: 5, title: "运营部", desc: "负责日常运营与数据分析" },
+	{ value: 6, title: "财务部", desc: "负责财务管理与成本控制" },
+	{ value: 7, title: "人事部", desc: "负责招聘与员工管理" },
+	{ value: 8, title: "法务部", desc: "负责法律合规事务" },
+	{ value: 9, title: "行政部", desc: "负责后勤保障与行政管理" },
+	{ value: 10, title: "客服部", desc: "负责客户服务与售后支持" },
+];
+
+const fetchDepartments: ListSelectorApi = async (params) => {
+	await new Promise((r) => setTimeout(r, 400));
+	let list = [...ALL_DEPARTMENTS];
+	if (params.keyword) {
+		const kw = params.keyword.toLowerCase();
+		list = list.filter(
+			(item) =>
+				item.title.toLowerCase().includes(kw) ||
+				(item.desc && item.desc.toLowerCase().includes(kw)),
+		);
+	}
+	const start = (params.pageNumber - 1) * params.pageSize;
+	return { data: list.slice(start, start + params.pageSize), total: list.length };
+};
 const SelectorDemo: React.FC = () => {
 	const tableViewRef = useRef<TableModalViewRef<EmployeeRow>>(null);
-	// TreeSelector
-	const [areaSelected, setAreaSelected] = useState<TreeSelectorNode[]>([]);
 	const handleAreaChange = useCallback((selected: TreeSelectorNode[]) => {
-		setAreaSelected(selected);
 		window.$message?.success?.(
 			`已选择: ${selected.map((s) => s.title).join("、")}`,
 		);
 	}, []);
 
 	// TableSelector 多选
-	const [employeeSelected, setEmployeeSelected] = useState<TableSelectorNode[]>(
-		[],
-	);
 	const handleEmployeeChange = useCallback((selected: TableSelectorNode[]) => {
-		setEmployeeSelected(selected);
 		window.$message?.success?.(
 			`已选择: ${selected.map((s) => s.title).join("、")}`,
 		);
 	}, []);
 
-	// TableSelector 单选
-
 	// TableSelector 自定义触发器状态
-	const [employeeCustomSelected, setEmployeeCustomSelected] = useState<TableSelectorNode[]>([]);
-	const handleEmployeeCustomChange = useCallback((selected: TableSelectorNode[]) => {
-		setEmployeeCustomSelected(selected);
-		window.$message?.success?.(`已选择: ${selected.map((s) => s.title).join("、")}`);
-	}, []);
-	const [employeeRadioSelected, setEmployeeRadioSelected] = useState<
-		TableSelectorNode[]
-	>([]);
-	const handleEmployeeRadioChange = useCallback(
+	const handleEmployeeCustomChange = useCallback(
 		(selected: TableSelectorNode[]) => {
-			setEmployeeRadioSelected(selected);
 			window.$message?.success?.(
 				`已选择: ${selected.map((s) => s.title).join("、")}`,
 			);
 		},
 		[],
 	);
+	const handleEmployeeRadioChange = useCallback(
+		(selected: TableSelectorNode[]) => {
+			window.$message?.success?.(
+				`已选择: ${selected.map((s) => s.title).join("、")}`,
+			);
+		},
+		[],
+	);
+
+	const handleDeptChange = useCallback((selected: ListSelectorNode[]) => {
+		window.$message?.success?.(
+			`已选择: ${selected.map((s) => s.title).join("、")}`,
+		);
+	}, []);
 
 	return (
 		<div className="flex flex-col gap-4 mb-36">
@@ -265,7 +296,6 @@ const SelectorDemo: React.FC = () => {
 				<TreeSelector
 					title="选择经营区域"
 					treeData={AREA_TREE_DATA}
-					checkedKeys={areaSelected}
 					onChange={handleAreaChange}
 					placeholder="请选择经营区域"
 				/>
@@ -279,7 +309,6 @@ const SelectorDemo: React.FC = () => {
 					title="选择员工"
 					api={fetchEmployees}
 					columns={EMPLOYEE_COLUMNS}
-					checkedKeys={employeeSelected}
 					onChange={handleEmployeeChange}
 					placeholder="请选择员工"
 					search={EMPLOYEE_SEARCH_CONFIG}
@@ -294,7 +323,6 @@ const SelectorDemo: React.FC = () => {
 					title="选择负责人"
 					api={fetchEmployees}
 					columns={EMPLOYEE_COLUMNS}
-					checkedKeys={employeeRadioSelected}
 					onChange={handleEmployeeRadioChange}
 					placeholder="请选择负责人"
 					search={EMPLOYEE_SEARCH_CONFIG}
@@ -325,13 +353,13 @@ const SelectorDemo: React.FC = () => {
 
 			<Card title="案例五：表格选择器（自定义触发器）">
 				<p className="text-gray-500 text-sm mb-4">
-					通过 renderTrigger 自定义触发器为 Button，显示已选数量。点击按钮打开弹窗进行选择。
+					通过 renderTrigger 自定义触发器为
+					Button，显示已选数量。点击按钮打开弹窗进行选择。
 				</p>
 				<TableSelector<EmployeeRow>
 					title="选择员工"
 					api={fetchEmployees}
 					columns={EMPLOYEE_COLUMNS}
-					checkedKeys={employeeCustomSelected}
 					onChange={handleEmployeeCustomChange}
 					placeholder="请选择员工"
 					search={EMPLOYEE_SEARCH_CONFIG}
@@ -346,6 +374,19 @@ const SelectorDemo: React.FC = () => {
 								: "点击选择员工"}
 						</Button>
 					)}
+				/>
+			</Card>
+
+			<Card title="案例六：ListSelector 列表选择器">
+				<p className="text-gray-500 text-sm mb-4">
+					演示列表式多选选择器，基于 Checkbox 列表实现。与 TreeSelector
+					结构一致，但数据源为扁平列表（无层级）。
+				</p>
+				<ListSelector
+					title="选择部门"
+					api={fetchDepartments}
+					onChange={handleDeptChange}
+					placeholder="请选择部门"
 				/>
 			</Card>
 		</div>

@@ -92,3 +92,45 @@ export interface TableSelectorProps<T = Record<string, any>> extends Omit<
 	/** 自定义触发器，传入后替换默认 Tag 触发器 */
 	renderTrigger?: (props: SelectorTriggerRenderProps<TableSelectorNode>) => ReactNode;
 }
+
+/** 列表项原始数据 */
+export interface ListItemData {
+	value: number | string;
+	title: string;
+	desc?: string;
+	[key: string]: any;
+}
+
+/** 列表已选项 */
+export type ListSelectorNode = TableSelectorNode;
+
+/** ListSelector api 函数签名 */
+export interface ListSelectorApiParams {
+	pageNumber: number;
+	pageSize: number;
+	keyword?: string;
+}
+
+export type ListSelectorApi = (
+	params: ListSelectorApiParams,
+) => Promise<{ data: ListItemData[]; total: number } | undefined>;
+
+/** ListSelector Props（触发器 + 弹窗） */
+export interface ListSelectorProps {
+	/** 弹窗标题，默认 "选择数据" */
+	title?: string;
+	/** 已选数据（受控） */
+	checkedKeys?: ListSelectorNode[];
+	/** 选择变化回调 */
+	onChange?: (selected: ListSelectorNode[]) => void;
+	/** 数据请求函数（必填） */
+	api: ListSelectorApi;
+	/** 占位文本，默认 "请选择" */
+	placeholder?: string;
+	/** 是否禁用 */
+	disabled?: boolean;
+	/** 弹窗宽度，默认 820 */
+	width?: number;
+	/** 自定义触发器 */
+	renderTrigger?: (props: SelectorTriggerRenderProps<ListSelectorNode>) => ReactNode;
+}

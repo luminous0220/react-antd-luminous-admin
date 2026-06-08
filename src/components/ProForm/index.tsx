@@ -290,7 +290,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 					form={form}
 					initialValues={normalizedInitialValues}
 					layout={isInlineMode ? "inline" : formProps.layout}
-					labelCol={{ style: { width: 120 } }}
+					labelCol={{ style: { width: 90 } }}
 					className={isInlineMode ? "flex gap-x-2 gap-y-3" : ""}
 					{...formProps}
 				>
