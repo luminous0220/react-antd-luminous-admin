@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback, useMemo, useRef, useImperativeHandle } from "react";
+import {
+	useState,
+	useEffect,
+	useCallback,
+	useMemo,
+	useRef,
+	useImperativeHandle,
+} from "react";
 import { Table, Card, Form } from "antd";
 import type { TableColumnType } from "antd";
 import ExcelJS from "exceljs";
@@ -81,6 +88,8 @@ export function ProTableInner<T>(
 
 	// 是否已初始化（防止重复请求）
 	const initializedRef = useRef(false);
+	// 记录初始分页（避免 mount 时两个 effect 各触发一次 refresh）
+	const prevPaginationRef = useRef(pagination);
 
 	// 刷新数据（合并筛选参数）
 	const refresh = useCallback(async () => {
@@ -142,11 +151,18 @@ export function ProTableInner<T>(
 		refresh();
 	}, [api, auto, refresh]);
 
-	// 分页变化时重新请求
+	// 分页变化时重新请求（跳过初始值，避免与自动请求重复）
 	useEffect(() => {
 		if (!api || !auto || !initializedRef.current) return;
+		const prev = prevPaginationRef.current;
+		if (
+			prev.pageNumber === pagination.pageNumber &&
+			prev.pageSize === pagination.pageSize
+		)
+			return;
+		prevPaginationRef.current = pagination;
 		refresh();
-	}, [pagination.pageNumber, pagination.pageSize, api, auto, refresh]);
+	}, [pagination, api, auto, refresh]);
 
 	// 筛选值变化时重新请求（重置分页到第一页）
 	useEffect(() => {
@@ -534,8 +550,3 @@ export function ProTableInner<T>(
 		</>
 	);
 }
-
-/**
- * ProTable 增强表格组件（forwardRef + memo）
- * 通过 ref 可调用 refresh() / getDataSource() / reset() 等
- */

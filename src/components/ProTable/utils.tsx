@@ -1,9 +1,9 @@
-import Text from "antd/es/typography/Text";
 import type {
 	ProTableColumnType,
 	ProTableColumnConfig,
 	ProTableColumnFixed,
 } from "./types.d";
+import { Tag } from "antd";
 
 /** 默认分页大小 */
 export const DEFAULT_PAGE_SIZE = 20;
@@ -110,13 +110,7 @@ export function createIndexColumn<T>(
 		fixed: "left",
 		render: (_, __, index) => {
 			const idx = (pageNumber - 1) * pageSize + index + 1;
-			return (
-				<div className="flex-center">
-					<Text className="flex-center min-w-5 min-h-5 rounded-[100%] bg-[var(--ant-color-primary-hover)] !text-white !text-[11px]">
-						{idx}
-					</Text>
-				</div>
-			);
+			return <Tag className="bg-[var(--ant-color-primary-bg)]">{idx}</Tag>;
 		},
 	};
 }

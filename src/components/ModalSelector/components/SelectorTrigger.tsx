@@ -5,7 +5,9 @@ import type { SelectorTriggerItem, SelectorTriggerProps } from "../types";
 /**
  * @description 选择器触发器 — 默认展示 Tag + 计数 + 下拉图标，支持自定义触发器
  */
-export function SelectorTrigger<T extends SelectorTriggerItem = SelectorTriggerItem>({
+export function SelectorTrigger<
+	T extends SelectorTriggerItem = SelectorTriggerItem,
+>({
 	selectedItems,
 	placeholder,
 	disabled,
@@ -52,9 +54,6 @@ export function SelectorTrigger<T extends SelectorTriggerItem = SelectorTriggerI
 						{item.title}
 					</Tag>
 				))}
-				<span className="text-gray-500 text-sm shrink-0 ml-0.5">
-					共 {selectedItems.length} 项
-				</span>
 				{!selectedItems.length && (
 					<span className="text-gray-400 text-sm">{placeholder}</span>
 				)}
@@ -68,9 +67,7 @@ export function SelectorTrigger<T extends SelectorTriggerItem = SelectorTriggerI
 							px-1.5 rounded-full text-xs font-medium
 							bg-[var(--ant-color-primary)] text-white"
 					>
-						{selectedItems.length > 999
-							? "999+"
-							: selectedItems.length}
+						{selectedItems.length > 999 ? "999+" : selectedItems.length}
 					</span>
 				)}
 				<IconChevronDown size={16} className="text-gray-400" />
