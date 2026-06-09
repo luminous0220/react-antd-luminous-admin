@@ -90,6 +90,8 @@ export function ProTableInner<T>(
 	const initializedRef = useRef(false);
 	// 记录初始分页（避免 mount 时两个 effect 各触发一次 refresh）
 	const prevPaginationRef = useRef(pagination);
+	// 强制刷新标识
+	const forceRefreshRef = useRef(false);
 
 	// 刷新数据（合并筛选参数）
 	const refresh = useCallback(async () => {
@@ -157,11 +159,13 @@ export function ProTableInner<T>(
 		const prev = prevPaginationRef.current;
 		if (
 			prev.pageNumber === pagination.pageNumber &&
-			prev.pageSize === pagination.pageSize
+			prev.pageSize === pagination.pageSize &&
+			!forceRefreshRef.current
 		)
 			return;
 		prevPaginationRef.current = pagination;
 		refresh();
+		forceRefreshRef.current = false;
 	}, [pagination, api, auto, refresh]);
 
 	// 筛选值变化时重新请求（重置分页到第一页）
@@ -170,6 +174,7 @@ export function ProTableInner<T>(
 		setPagination((prev) =>
 			prev.pageNumber === 1 ? prev : { ...prev, pageNumber: 1 },
 		);
+		forceRefreshRef.current = true;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [searchValues]);
 
