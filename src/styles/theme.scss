@@ -15,3 +15,18 @@
 	align-items: center;
 	justify-content: center;
 }
+
+.side-menu {
+	.ant-menu-item-selected {
+		&::before {
+			content: "";
+			display: block;
+			width: 4px;
+			height: 100%;
+			background: var(--ant-color-primary-active);
+			position: absolute;
+			left: 0;
+			z-index: 999;
+		}
+	}
+}

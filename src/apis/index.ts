@@ -68,6 +68,102 @@ export const Api = {
 			url: "/system/api/Role/delete",
 			params: { id },
 		}),
+	// 角色权限
+	getRolePermissions: (roleId: string) =>
+		http.get<IApi.RolePermissionsRes>({
+			url: "/system/api/Role/permission",
+			params: { roleId },
+		}),
+	saveRolePermissions: (params: { roleId: string; menuIds: string[] }) =>
+		http.post<void>({
+			url: "/system/api/Role/permission/save",
+			params,
+		}),
+	// 部门管理
+	getDepartmentList: () =>
+		http.get<IApi.DepartmentItem[]>({
+			url: "/system/api/Department/list",
+		}),
+	saveDepartment: (params: IApi.DepartmentReq) =>
+		http.post<IApi.DepartmentItem>({
+			url: "/system/api/Department/save",
+			params,
+		}),
+	deleteDepartment: (id: string) =>
+		http.delete<void>({
+			url: "/system/api/Department/delete",
+			params: { id },
+		}),
+	// 岗位管理
+	getPostList: (params: Record<string, unknown>) =>
+		http.get<IApi.PageList<IApi.PostItem>>({
+			url: "/system/api/Post/list",
+			params,
+		}),
+	savePost: (params: IApi.PostReq) =>
+		http.post<IApi.PostItem>({
+			url: "/system/api/Post/save",
+			params,
+		}),
+	deletePost: (id: string) =>
+		http.delete<void>({
+			url: "/system/api/Post/delete",
+			params: { id },
+		}),
+	// 字典管理 - 类型
+	getDictTypeList: (params: Record<string, unknown>) =>
+		http.get<IApi.PageList<IApi.DictTypeItem>>({
+			url: "/system/api/DictType/list",
+			params,
+		}),
+	saveDictType: (params: IApi.DictTypeReq) =>
+		http.post<IApi.DictTypeItem>({
+			url: "/system/api/DictType/save",
+			params,
+		}),
+	deleteDictType: (id: string) =>
+		http.delete<void>({
+			url: "/system/api/DictType/delete",
+			params: { id },
+		}),
+	// 字典管理 - 数据
+	getDictDataList: (params: Record<string, unknown>) =>
+		http.get<IApi.PageList<IApi.DictDataItem>>({
+			url: "/system/api/DictData/list",
+			params,
+		}),
+	saveDictData: (params: IApi.DictDataReq) =>
+		http.post<IApi.DictDataItem>({
+			url: "/system/api/DictData/save",
+			params,
+		}),
+	deleteDictData: (id: string) =>
+		http.delete<void>({
+			url: "/system/api/DictData/delete",
+			params: { id },
+		}),
+	// 登录日志
+	getLoginLogList: (params: Record<string, unknown>) =>
+		http.get<IApi.PageList<IApi.LoginLogItem>>({
+			url: "/system/api/LoginLog/list",
+			params,
+		}),
+	// 操作日志
+	getOperationLogList: (params: Record<string, unknown>) =>
+		http.get<IApi.PageList<IApi.OperationLogItem>>({
+			url: "/system/api/OperationLog/list",
+			params,
+		}),
+	// 网站配置
+	getSiteConfig: () =>
+		http.get<IApi.SiteConfigItem>({
+			url: "/system/api/SiteConfig/detail",
+		}),
+	saveSiteConfig: (params: IApi.SiteConfigItem) =>
+		http.post<void>({
+			url: "/system/api/SiteConfig/save",
+			params,
+		}),
 };
 
 export * from "./type.d";

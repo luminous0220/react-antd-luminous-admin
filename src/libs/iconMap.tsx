@@ -51,6 +51,7 @@ import {
 	WarningOutlined,
 	WechatOutlined,
 	WindowsOutlined,
+	DatabaseFilled,
 } from "@ant-design/icons";
 import {
 	IconAlarm,
@@ -73,6 +74,7 @@ import {
 	IconCloud,
 	IconCloudDownload,
 	IconCloudUpload,
+	IconDatabase,
 	IconDownload,
 	IconEdit,
 	IconEye,
@@ -168,6 +170,7 @@ export const IconMap: Record<string, React.ReactNode> = {
 	WarningOutlined: <WarningOutlined />,
 	WechatOutlined: <WechatOutlined />,
 	WindowsOutlined: <WindowsOutlined />,
+	DatabaseFilled: <DatabaseFilled />,
 };
 
 // @tabler/icons-react 图标映射表
@@ -231,4 +234,5 @@ export const TablerIconMap: Record<string, React.ReactNode> = {
 	IconVideo: <IconVideo stroke={2} />,
 	IconWifi: <IconWifi stroke={2} />,
 	IconX: <IconX stroke={2} />,
+	IconDatabase: <IconDatabase stroke={2} />,
 };

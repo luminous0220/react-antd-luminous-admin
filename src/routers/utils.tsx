@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { RouteObject } from "react-router";
+import { Spin } from "antd";
 import { IApi } from "@/apis";
 
 // 空页面组件（开发中）
@@ -14,11 +15,17 @@ const EmptyPage = () => (
 	</div>
 );
 
-// 懒加载组件包装器
+// 懒加载组件包装器（带 fallback，保证过渡动画可见）
 const LazyWrapper = (
 	Component: React.LazyExoticComponent<React.ComponentType<any>>,
 ) => (
-	<Suspense>
+	<Suspense
+		fallback={
+			<div className="size-full flex items-center justify-center">
+				<Spin />
+			</div>
+		}
+	>
 		<Component />
 	</Suspense>
 );

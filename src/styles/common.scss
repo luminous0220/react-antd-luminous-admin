@@ -64,28 +64,24 @@
 	animation-delay: 1.5s;
 }
 
-/* 页面切换过渡动画 */
-
-/* 默认状态 */
-.transition-wrapper {
-	opacity: 1;
-	transform: translateX(0);
-	transition:
-		opacity 0.25s ease-out,
-		transform 0.25s ease-out;
-}
-
-/* 淡出：从左往右 0→30px，透明度降低 */
-.page-exit {
-	opacity: 0;
-	transform: translateX(30px);
-	transition:
-		opacity 0.2s ease-in,
-		transform 0.2s ease-in;
-}
-
-/* 淡入初始状态：从左侧 -30px 开始 */
+/* 页面切换过渡动画（react-transition-group classNames="page"） */
 .page-enter {
 	opacity: 0;
 	transform: translateX(-30px);
+}
+.page-enter-active {
+	opacity: 1;
+	transform: translateX(0);
+	transition: opacity 250ms ease-out, transform 250ms ease-out;
+}
+
+.page-exit {
+	opacity: 1;
+	transform: translateX(0);
+}
+.page-exit-active {
+	opacity: 0;
+	transform: translateX(30px);
+	transition: opacity 200ms ease-in, transform 200ms ease-in;
+	pointer-events: none;
 }

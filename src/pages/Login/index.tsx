@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useMemo } from "react";
 import { Button, Checkbox, ConfigProvider, theme, Form } from "antd";
 import { useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
 
 import { Api, IApi } from "@/apis";
 import { setToken, setItem, getItem, removeItem } from "@/libs/storage";
@@ -22,6 +23,13 @@ const REMEMBER_TTL = 30 * 24 * 60 * 60 * 1000;
 
 // 副标题
 const SUB_TITLE = "智能高效，赋能企业数字化管理新征程";
+
+/** 表单区域子元素错峰入场配置 */
+const fadeUp = {
+	initial: { opacity: 0, y: 24 },
+	animate: { opacity: 1, y: 0 },
+	transition: { duration: 0.45, ease: "easeOut" as const },
+};
 
 const Login = () => {
 	const formRef = useRef<ProFormInstance>(null);
@@ -410,7 +418,7 @@ const Login = () => {
 				{/* 右侧登录功能区 */}
 				<div className="flex-1 flex flex-col bg-white dark:bg-[#071124] relative shadow-[-4px_0_24px_rgba(0,0,0,0.1)] dark:shadow-[-4px_0_24px_rgba(0,0,0,0.3)]">
 					{/* 右上角主题切换 */}
-					<div className="absolute top-4 right-4 flex items-center gap-2">
+					<div className="absolute z-[999] top-4 right-4 flex items-center gap-2">
 						{/* 预设颜色选择 */}
 						<div className="flex gap-1">
 							{(Object.keys(PRESET_COLORS) as PresetColorKey[]).map(
@@ -455,30 +463,48 @@ const Login = () => {
 					</div>
 
 					{/* 登录表单区域 */}
-					<div className="md:p-16 flex-1 flex items-center justify-center p-8">
+					<motion.div
+						className="md:p-16 flex-1 flex items-center justify-center p-8"
+						initial={{ opacity: 0, y: -40 }}
+						animate={{ opacity: 1, x: 0 }}
+						transition={{ duration: 0.5, ease: "easeOut" as const }}
+					>
 						<div className="w-[95%] xl:w-full">
 							{/* 欢迎文案 */}
-							<div className="mb-8">
+							<motion.div
+								className="mb-8"
+								{...fadeUp}
+								transition={{ ...fadeUp.transition, delay: 0.1 }}
+							>
 								<h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
 									欢迎回来 👋
 								</h2>
 								<p className="text-gray-500 dark:text-gray-400">
 									请输入您的帐户信息以开始管理您的项目
 								</p>
-							</div>
+							</motion.div>
 
 							{/* 登录表单 */}
-							<ProForm
-								type="pure"
-								ref={formRef}
-								fields={formItems}
-								layout="vertical"
-								footer={null}
-								autoComplete="off"
-								size="large"
-							/>
+							<motion.div
+								{...fadeUp}
+								transition={{ ...fadeUp.transition, delay: 0.2 }}
+							>
+								<ProForm
+									type="pure"
+									ref={formRef}
+									fields={formItems}
+									layout="vertical"
+									footer={null}
+									autoComplete="off"
+									size="large"
+								/>
+							</motion.div>
 
-							<div className="mt-4">
+							<motion.div
+								className="mt-4"
+								{...fadeUp}
+								transition={{ ...fadeUp.transition, delay: 0.3 }}
+							>
 								{/* 记住密码复选框 */}
 								<Form.Item className="mb-4">
 									<Checkbox
@@ -497,14 +523,19 @@ const Login = () => {
 								>
 									登录
 								</Button>
-							</div>
+							</motion.div>
 
 							{/* 页脚版权 */}
-							<div className="mt-8 text-center text-gray-400 text-sm">
+							<motion.div
+								className="mt-8 text-center text-gray-400 text-sm"
+								initial={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.4, delay: 0.5 }}
+							>
 								Copyright © 2024 zhanyyi. All rights reserved.
-							</div>
+							</motion.div>
 						</div>
-					</div>
+					</motion.div>
 				</div>
 			</div>
 		</ConfigProvider>

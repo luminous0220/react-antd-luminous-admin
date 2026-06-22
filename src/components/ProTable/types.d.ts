@@ -91,6 +91,8 @@ export interface ProTableProps<T>
 		exportable?: boolean;
 		/** 导出文件名（不含扩展名），默认使用 title 或当前日期 */
 		exportFileName?: string;
+		/** 自定义导出回调，传入后覆盖内置 Excel 导出，接收已选行数据 */
+		onExport?: (selectedRows: T[]) => void | Promise<void>;
 		/** 是否开启行拖拽排序，默认 false */
 		dragSort?: boolean;
 		/** 拖拽排序结束回调，传入重新排序后的完整数据 */

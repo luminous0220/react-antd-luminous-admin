@@ -153,7 +153,6 @@ src/
 - **Calendar**（`src/components/Calendar/`）— 日历组件，带提醒功能，由 `useCalendarStore` 支持。
 - **ThemeToggle**（`src/components/ThemeToggle/`）— 深色/浅色切换按钮，使用 View Transitions API（`document.startViewTransition`），从点击位置执行圆形 clip-path 扩散动画。不支持的浏览器回退为即时切换。
 - **ThemePanel**（`src/components/ThemePanel/`）— 设置面板，包含深色模式开关和主题色选择器（预设颜色 + 自定义）。
-- **AnimateTransition**（`src/components/AnimateTransition/`）— 基于 `animate.css` 的入场/退场动画包裹组件，支持挂载/卸载控制。
 - **ModalSelector**（`src/components/ModalSelector/`）— 模态选择器，支持 ListSelector、TableSelector、TreeSelector 三种模式，包含 `SelectedPanel`、`SelectorFooter`、`SelectorTrigger` 子组件。
 - **IconSelect**（`src/components/IconSelect/`）— 图标选择组件，从 `src/libs/iconMap.tsx` 注册的图标集中选取。
 

@@ -391,6 +391,10 @@ const case4Fields: ProFormFields = [
 				{ label: "否", value: "no" },
 			],
 		},
+		formItemProps: {
+			labelAlign: "left",
+			labelCol: { style: { width: 150 } },
+		},
 	},
 	{
 		type: "input",
@@ -493,9 +497,7 @@ const CASES = [
 	},
 ];
 
-
 const BasicForm: React.FC = () => {
-
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -510,17 +512,12 @@ const BasicForm: React.FC = () => {
 							type="pure"
 							fields={c.fields}
 							initialValues={c.initialValues}
-							layout={"layout" in c ? c.layout : undefined}
 							collapsible={"collapsible" in c ? c.collapsible : undefined}
 							onConfirm={handleSubmit}
-							className={
-								c.title === "案例二：折叠表单" ? "grid grid-cols-2 gap-4	" : ""
-							}
 						/>
 					</Card>
 				))}
 			</div>
-
 		</div>
 	);
 };

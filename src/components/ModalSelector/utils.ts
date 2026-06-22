@@ -1,7 +1,25 @@
 import type { TreeNodeData, TreeSelectorNode } from "./types";
 
-
-
+/** 获取节点到根的所有祖先 key（由近到远） */
+export function getAncestorKeys(
+	treeData: TreeNodeData[],
+	value: React.Key,
+): React.Key[] {
+	const result: React.Key[] = [];
+	const walk = (nodes: TreeNodeData[], ancestors: React.Key[]) => {
+		for (const node of nodes) {
+			if (node.value === value) {
+				result.push(...ancestors);
+				return;
+			}
+			if (node.children?.length) {
+				walk(node.children, [...ancestors, node.value]);
+			}
+		}
+	};
+	walk(treeData, []);
+	return result;
+}
 
 /** 递归获取某节点的所有子孙 key */
 export function getDescendantKeys(
@@ -62,7 +80,10 @@ export function findParentNode(
 }
 
 /** 搜索过滤树数据，保留匹配节点及其祖先 */
-export function filterTree(nodes: TreeNodeData[], keyword: string): TreeNodeData[] {
+export function filterTree(
+	nodes: TreeNodeData[],
+	keyword: string,
+): TreeNodeData[] {
 	if (!keyword.trim()) return nodes;
 
 	const kw = keyword.toLowerCase();

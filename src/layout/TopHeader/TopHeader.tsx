@@ -211,10 +211,12 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 				</AutoComplete>
 			</div>
 
-			{/* 右侧：主题切换 + 系统设置 + 用户头像 */}
+			{/* 右侧：主题切换 + 系统设置 + 用户头像（错峰淡入） */}
 			<div className="flex items-center gap-2">
 				<ThemeToggle />
+
 				<Setting />
+
 				<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
 					<Space className="cursor-pointer">
 						<Avatar

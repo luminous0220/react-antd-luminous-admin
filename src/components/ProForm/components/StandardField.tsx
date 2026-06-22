@@ -26,7 +26,7 @@ export const StandardField = memo(function StandardField({
 	const initialValue = form.getFieldValue(field.name);
 	const hidden = field.visible === false;
 	const disabled = field.disabled === true;
-	const className = isInlineMode ? "min-w-[160px]" : "";
+	const className = isInlineMode ? "min-w-[180px]" : "";
 	const commonProps = {
 		name,
 		label,

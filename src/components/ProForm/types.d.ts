@@ -119,7 +119,7 @@ type ProFormProps = Omit<FormProps, "fields" | "title" | "onFinish"> & {
 		values: FormValues,
 		extraParams?: Record<string, any>,
 	) => Promise<void> | void;
-	/** 折叠配置，传入后启用折叠功能，配合 layout="inline" 使用 */
+	/** 折叠配置，传入后启用折叠功能，不依赖 inline 布局 */
 	collapsible?: ProFormCollapseConfig;
 	/** 显示模式：modal（弹窗，默认）、drawer（抽屉）、pure（纯表单） */
 	type?: ProFormMode;

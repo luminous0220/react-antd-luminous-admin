@@ -103,7 +103,7 @@ export function createIndexColumn<T>(
 	return {
 		key: "__index__",
 		title: "序号",
-		width, // 👈 减小到 50，更紧凑
+		width,
 		align: "center", // 明确对齐
 		hideable: false,
 		fixable: false,

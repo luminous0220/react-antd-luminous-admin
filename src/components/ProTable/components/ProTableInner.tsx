@@ -60,6 +60,7 @@ export function ProTableInner<T>(
 		search,
 		exportable = false,
 		exportFileName,
+		onExport,
 		dragSort = false,
 		onDragSortEnd,
 		rowKey,
@@ -93,10 +94,11 @@ export function ProTableInner<T>(
 	// 强制刷新标识
 	const forceRefreshRef = useRef(false);
 
+	const ignore = useRef(false);
 	// 刷新数据（合并筛选参数）
 	const refresh = useCallback(async () => {
-		if (!api) return;
-
+		if (!api || ignore.current) return;
+		ignore.current = true;
 		setLoading(true);
 		try {
 			const result = await api({
@@ -107,11 +109,9 @@ export function ProTableInner<T>(
 			if (!result || !result.data) return;
 			setDataSource(result.data);
 			setTotal(result.total || 0);
-		} catch (error) {
-			console.error("ProTable fetch error:", error);
-			window.$message?.error?.("数据加载失败");
 		} finally {
 			setLoading(false);
+			ignore.current = false;
 		}
 	}, [api, pagination.pageNumber, pagination.pageSize, searchValues]);
 
@@ -313,8 +313,20 @@ export function ProTableInner<T>(
 		pagination.pageSize,
 	]);
 
-	// 导出 Excel
+	// 导出 Excel / 自定义导出
 	const handleExport = useCallback(async () => {
+		// 自定义导出回调：直接调用，由调用方自行处理导出逻辑
+		if (onExport) {
+			try {
+				setLoading(true);
+				await onExport(selectedRows);
+			} finally {
+				setLoading(false);
+			}
+			return;
+		}
+
+		// 内置 Excel 导出
 		if (!selectedRows.length) {
 			window.$message?.warning?.("请选择要导出的行");
 			return;
@@ -382,7 +394,7 @@ export function ProTableInner<T>(
 		} catch {
 			window.$message?.error?.("导出失败，请重试");
 		}
-	}, [selectedRows, renderedColumns, title, exportFileName]);
+	}, [onExport, selectedRows, renderedColumns, title, exportFileName]);
 
 	// 密度变化回调
 	const handleDensityChange = useCallback(

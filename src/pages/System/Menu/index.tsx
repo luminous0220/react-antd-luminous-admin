@@ -1,5 +1,14 @@
-import React, { useCallback, useMemo, useRef } from "react";
-import { Tag, Button, Space, Popconfirm, Switch, Tooltip } from "antd";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import {
+	Tag,
+	Button,
+	Space,
+	Popconfirm,
+	Switch,
+	Tooltip,
+	Radio,
+	Form,
+} from "antd";
 import { IconPlus } from "@tabler/icons-react";
 import {
 	ProTable,
@@ -38,9 +47,14 @@ function renderIcon(iconName: string) {
 const Menu: React.FC = () => {
 	const modalRef = useRef<ProFormInstance>(null);
 	const TableRef = useRef<ProTableRef>(null);
+	const [form] = Form.useForm();
+
+	// topContent 中 Radio.Group 的值（本地 state，不与 Form.Item 绑定）
+	const [typeValue, setTypeValue] = useState<number>(2);
 
 	// 新增
 	const openAdd = useCallback(() => {
+		setTypeValue(2);
 		modalRef.current?.open({
 			title: "新增菜单",
 			initialValues: { status: true, type: 2, sort: 1 },
@@ -49,6 +63,7 @@ const Menu: React.FC = () => {
 
 	// 编辑
 	const openEdit = useCallback((record: IApi.MenuItem) => {
+		setTypeValue(record.type);
 		modalRef.current?.open({
 			title: "编辑菜单",
 			initialValues: { ...record, status: record.status === 1 },
@@ -247,26 +262,13 @@ const Menu: React.FC = () => {
 				},
 			},
 			{
-				type: "select",
-				name: "type",
-				label: "类型",
-				formItemProps: { rules: [{ required: true, message: "请选择类型" }] },
-				fieldProps: {
-					placeholder: "请选择",
-					options: [
-						{ label: "目录", value: 1 },
-						{ label: "菜单", value: 2 },
-					],
-				},
-			},
-			{
 				type: "input",
 				name: "path",
 				label: "路由路径",
 				formItemProps: {
 					rules: [{ required: true, message: "请输入路由路径" }],
 				},
-				fieldProps: { placeholder: "如: /system/menu", allowClear: true },
+				fieldProps: { placeholder: "如: /auth/menu", allowClear: true },
 			},
 			{
 				type: "select",
@@ -307,10 +309,33 @@ const Menu: React.FC = () => {
 		[],
 	);
 
+	// 顶部类型切换（纯 Radio.Group，本地 state 驱动 + 同步写入 form store）
+	const topContent = useMemo(
+		() => (
+			<div className="w-[70%] mb-6 mx-auto">
+				<Radio.Group
+					block
+					className="w-full"
+					optionType="button"
+					buttonStyle="solid"
+					value={typeValue}
+					onChange={(e) => {
+						const val = e.target.value;
+						setTypeValue(val);
+						form.setFieldsValue({ type: val });
+					}}
+				>
+					<Radio value={1}>目录</Radio>
+					<Radio value={2}>菜单</Radio>
+				</Radio.Group>
+			</div>
+		),
+		[typeValue, form],
+	);
+
 	const tableProps: ProTableProps<IApi.MenuItem> = useMemo(() => {
 		return {
 			index: true,
-			indexWidth: 100,
 			ref: TableRef,
 			title: "菜单管理",
 			dragSort: true,
@@ -334,8 +359,10 @@ const Menu: React.FC = () => {
 
 			<ProForm
 				ref={modalRef}
+				form={form}
 				type="drawer"
 				fields={formFields}
+				topContent={topContent}
 				width={700}
 				labelCol={{ style: { width: 90 } }}
 				onConfirm={handleConfirm}

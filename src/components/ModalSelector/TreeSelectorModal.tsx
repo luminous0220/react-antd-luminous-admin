@@ -1,4 +1,12 @@
-import { useState, useCallback, useMemo, useEffect, forwardRef, useImperativeHandle, useRef } from "react";
+import {
+	useState,
+	useCallback,
+	useMemo,
+	useEffect,
+	forwardRef,
+	useImperativeHandle,
+	useRef,
+} from "react";
 import { Tree, Input, Button, Card, Spin } from "antd";
 import { IconSearch } from "@tabler/icons-react";
 import { ProModal } from "@/components/ProModal";
@@ -20,6 +28,7 @@ import {
 	filterTree,
 	getMatchedAncestorKeys,
 	buildSelectedFromKeys,
+	getAncestorKeys,
 } from "./utils";
 
 export type {
@@ -64,20 +73,17 @@ function TreeSelectorModalInner(
 	}, []);
 
 	// 请求数据
-	const fetchData = useCallback(
-		async (api: TreeSelectorApi) => {
-			setLoading(true);
-			try {
-				const result = await api();
-				if (result && Array.isArray(result)) {
-					setTreeData(result);
-				}
-			} finally {
-				setLoading(false);
+	const fetchData = useCallback(async (api: TreeSelectorApi) => {
+		setLoading(true);
+		try {
+			const result = await api();
+			if (result && Array.isArray(result)) {
+				setTreeData(result);
 			}
-		},
-		[],
-	);
+		} finally {
+			setLoading(false);
+		}
+	}, []);
 
 	const modalSelected = useMemo<TreeSelectorNode[]>(
 		() => buildSelectedFromKeys(modalCheckedKeys, treeData),
@@ -117,32 +123,63 @@ function TreeSelectorModalInner(
 			const key = node.key;
 			const currentKeys: React.Key[] = Array.isArray(checkedKeys)
 				? checkedKeys
-				: (checkedKeys as { checked: React.Key[] }).checked ?? [];
+				: ((checkedKeys as { checked: React.Key[] }).checked ?? []);
 			let newKeys = [...currentKeys];
 
 			if (checked) {
+				// 1. 选中所有子孙节点
 				const descendantKeys = getDescendantKeys(treeData, key);
 				for (const dk of descendantKeys) {
 					if (!newKeys.includes(dk)) newKeys.push(dk);
 				}
-				const parent = findParentNode(treeData, key);
-				if (parent) {
-					const allSiblingsChecked = parent.children!.every(
-						(child: TreeNodeData) => newKeys.includes(child.value),
-					);
-					if (allSiblingsChecked && !newKeys.includes(parent.value)) {
-						newKeys.push(parent.value);
-					}
+				// 2. 选中所有祖先节点（任意子节点选中 → 父节点选中）
+				const ancestorKeys = getAncestorKeys(treeData, key);
+				for (const ak of ancestorKeys) {
+					if (!newKeys.includes(ak)) newKeys.push(ak);
 				}
 			} else {
 				const nodeData = findNode(treeData, key);
 				if (nodeData?.children?.length) {
+					// 取消父节点 → 同时取消所有子孙节点
 					const descendantKeys = getDescendantKeys(treeData, key);
 					newKeys = newKeys.filter((k) => !descendantKeys.includes(k));
+					// 检查祖先：如果当前父节点被取消后祖先无任何已选子节点，则取消祖先
+					const ancestorKeys = getAncestorKeys(treeData, key);
+					for (const ak of ancestorKeys) {
+						const akNode = findNode(treeData, ak);
+						if (akNode?.children) {
+							const hasCheckedChild = akNode.children.some((c) =>
+								newKeys.includes(c.value),
+							);
+							if (!hasCheckedChild) {
+								newKeys = newKeys.filter((k) => k !== ak);
+							}
+						}
+					}
 				} else {
+					// 取消叶子节点
 					const parent = findParentNode(treeData, key);
 					if (parent) {
-						newKeys = newKeys.filter((k) => k !== parent.value);
+						// 仅当父节点下无任何其他已选兄弟时，才取消父节点
+						const siblingsChecked = parent.children!.some(
+							(c) => c.value !== key && newKeys.includes(c.value),
+						);
+						if (!siblingsChecked) {
+							newKeys = newKeys.filter((k) => k !== parent.value);
+							// 继续向上检查祖先
+							const ancestorKeys = getAncestorKeys(treeData, parent.value);
+							for (const ak of ancestorKeys) {
+								const akNode = findNode(treeData, ak);
+								if (akNode?.children) {
+									const hasCheckedChild = akNode.children.some((c) =>
+										newKeys.includes(c.value),
+									);
+									if (!hasCheckedChild) {
+										newKeys = newKeys.filter((k) => k !== ak);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -157,12 +194,35 @@ function TreeSelectorModalInner(
 		(item: TreeSelectorNode) => {
 			let newKeys = modalCheckedKeys.filter((k) => k !== item.value);
 			const nodeData = findNode(treeData, item.value);
+			// 如果删除的是父节点，同时删除所有子孙
 			if (nodeData?.children?.length) {
 				const descendantKeys = getDescendantKeys(treeData, item.value);
 				newKeys = newKeys.filter((k) => !descendantKeys.includes(k));
 			}
+			// 如果是子节点，检查父节点是否还有其他已选子节点
 			if (item.type === "child" && item.pid) {
-				newKeys = newKeys.filter((k) => k !== item.pid);
+				const parentNode = findNode(treeData, item.pid);
+				if (parentNode?.children) {
+					const hasCheckedSibling = parentNode.children.some(
+						(c) => c.value !== item.value && newKeys.includes(c.value),
+					);
+					if (!hasCheckedSibling) {
+						newKeys = newKeys.filter((k) => k !== item.pid);
+						// 继续向上检查祖先
+						const ancestorKeys = getAncestorKeys(treeData, item.pid);
+						for (const ak of ancestorKeys) {
+							const akNode = findNode(treeData, ak);
+							if (akNode?.children) {
+								const hasCheckedChild = akNode.children.some((c) =>
+									newKeys.includes(c.value),
+								);
+								if (!hasCheckedChild) {
+									newKeys = newKeys.filter((k) => k !== ak);
+								}
+							}
+						}
+					}
+				}
 			}
 			setModalCheckedKeys(newKeys);
 		},
@@ -183,7 +243,8 @@ function TreeSelectorModalInner(
 
 	const isAllSelected = useMemo(
 		() =>
-			allTreeKeys.length > 0 && allTreeKeys.every((k) => modalCheckedKeys.includes(k)),
+			allTreeKeys.length > 0 &&
+			allTreeKeys.every((k) => modalCheckedKeys.includes(k)),
 		[allTreeKeys, modalCheckedKeys],
 	);
 
@@ -256,7 +317,9 @@ function TreeSelectorModalInner(
 					<div className="col-span-6">
 						<Card
 							classNames={{ header: "!bg-[var(--ant-color-bg-layout)]" }}
-							styles={{ body: { padding: 12, overflow: "auto", maxHeight: "400px" } }}
+							styles={{
+								body: { padding: 12, overflow: "auto", maxHeight: "400px" },
+							}}
 							title={
 								<div className="flex justify-between items-center">
 									<span className="text-base">列表选择区域</span>
@@ -280,7 +343,11 @@ function TreeSelectorModalInner(
 										treeData={filteredTreeData as any}
 										expandedKeys={expandedKeys}
 										onExpand={(keys) => setExpandedKeys(keys as React.Key[])}
-										fieldNames={{ key: "value", title: "title", children: "children" }}
+										fieldNames={{
+											key: "value",
+											title: "title",
+											children: "children",
+										}}
 										titleRender={renderTreeNode as any}
 									/>
 								)}

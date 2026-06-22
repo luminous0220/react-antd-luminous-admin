@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useRef } from "react";
 import { Tag, Button, Space, Popconfirm, Switch } from "antd";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconSettings } from "@tabler/icons-react";
 import {
 	ProTable,
 	ProTableColumnType,
@@ -13,6 +13,11 @@ import type {
 	FormFieldItem,
 	FormValues,
 } from "@/components/ProForm";
+import {
+	TreeSelectorModal,
+	type TreeSelectorModalRef,
+	type TreeNodeData,
+} from "@/components/ModalSelector";
 import { Api } from "@/apis";
 import type { IApi } from "@/apis";
 
@@ -41,9 +46,26 @@ const searchConfig: ProTableSearchConfig = {
 	defaultShowCount: 2,
 };
 
+/**
+ * @description 将菜单树数据转换为 TreeSelectorModal 所需的 TreeNodeData 格式
+ */
+function transformMenuToTreeData(menus: IApi.MenuItem[]): TreeNodeData[] {
+	return menus.map((menu) => ({
+		value: menu.id,
+		title: menu.title,
+		children: menu.children?.length
+			? transformMenuToTreeData(menu.children)
+			: undefined,
+	}));
+}
+
 const Role: React.FC = () => {
 	const modalRef = useRef<ProFormInstance>(null);
+	const treeModalRef = useRef<TreeSelectorModalRef>(null);
 	const [refreshKey, setRefreshKey] = useState(0);
+
+	// 当前操作的 roleId（权限保存时使用）
+	const currentRoleIdRef = useRef<string>("");
 
 	// 新增
 	const openAdd = useCallback(() => {
@@ -78,6 +100,51 @@ const Role: React.FC = () => {
 				window.$message?.success?.("新增成功");
 			}
 			setRefreshKey((k) => k + 1);
+		},
+		[],
+	);
+
+	// 权限确认回调
+	const handlePermissionConfirm = useCallback(
+		async (selected: { value: string | number }[]) => {
+			const menuIds = selected.map((item) => String(item.value));
+			try {
+				await Api.saveRolePermissions({
+					roleId: currentRoleIdRef.current,
+					menuIds,
+				});
+				window.$message?.success?.("权限设置成功");
+				setRefreshKey((k) => k + 1);
+			} catch {
+				window.$message?.error?.("权限设置失败");
+			}
+		},
+		[],
+	);
+
+	// 打开权限弹窗（记住 roleId 后调用 TreeSelectorModal）
+	const handleOpenPermission = useCallback(
+		async (record: IApi.RoleItem) => {
+			currentRoleIdRef.current = record.id;
+			try {
+				const [menuTree, permissions] = await Promise.all([
+					Api.getMenuList(),
+					Api.getRolePermissions(record.id),
+				]);
+				const treeData = transformMenuToTreeData(menuTree);
+				const checkedKeys = permissions.menuIds.map((id) => ({
+					value: id,
+					title: "",
+					type: "child" as const,
+				}));
+				treeModalRef.current?.open({
+					title: `设置权限 - ${record.name}`,
+					treeData,
+					checkedKeys,
+				});
+			} catch {
+				window.$message?.error?.("获取菜单数据失败");
+			}
 		},
 		[],
 	);
@@ -156,12 +223,20 @@ const Role: React.FC = () => {
 			{
 				title: "操作",
 				key: "actions",
-				width: 150,
+				width: 260,
 				fixed: "right",
 				hideable: false,
 				fixable: false,
 				render: (_: unknown, record: IApi.RoleItem) => (
 					<Space>
+						<Button
+							type="link"
+							size="small"
+							icon={<IconSettings size={14} />}
+							onClick={() => handleOpenPermission(record)}
+						>
+							设置权限
+						</Button>
 						<Button type="link" size="small" onClick={() => openEdit(record)}>
 							编辑
 						</Button>
@@ -177,7 +252,7 @@ const Role: React.FC = () => {
 				),
 			},
 		],
-		[handleStatusChange, handleDelete, openEdit],
+		[handleStatusChange, handleDelete, openEdit, handleOpenPermission],
 	);
 
 	const formFields: FormFieldItem[] = useMemo(
@@ -254,6 +329,11 @@ const Role: React.FC = () => {
 				type="modal"
 				fields={formFields}
 				onConfirm={handleConfirm}
+			/>
+
+			<TreeSelectorModal
+				ref={treeModalRef}
+				onConfirm={handlePermissionConfirm}
 			/>
 		</div>
 	);

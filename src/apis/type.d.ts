@@ -134,6 +134,134 @@ export namespace IApi {
 		desc: string;
 	}
 
+	// 角色权限
+	interface RolePermissionsRes {
+		menuIds: string[];
+	}
+
+	// 部门管理
+	interface DepartmentItem {
+		id: string;
+		name: string;
+		code: string;
+		sort: number;
+		parentId: string | null;
+		status: 1 | 0;
+		desc: string;
+		children?: DepartmentItem[];
+		createTime: string;
+	}
+
+	interface DepartmentReq {
+		id?: string;
+		name: string;
+		code: string;
+		sort: number;
+		parentId: string | null;
+		status: 1 | 0;
+		desc: string;
+	}
+
+	// 岗位管理
+	interface PostItem {
+		id: string;
+		name: string;
+		code: string;
+		sort: number;
+		status: 1 | 0;
+		desc: string;
+		createTime: string;
+	}
+
+	interface PostReq {
+		id?: string;
+		name: string;
+		code: string;
+		sort: number;
+		status: 1 | 0;
+		desc: string;
+	}
+
+	// 字典管理
+	interface DictTypeItem {
+		id: string;
+		name: string;
+		code: string;
+		sort: number;
+		status: 1 | 0;
+		desc: string;
+		createTime: string;
+	}
+
+	interface DictTypeReq {
+		id?: string;
+		name: string;
+		code: string;
+		sort: number;
+		status: 1 | 0;
+		desc: string;
+	}
+
+	interface DictDataItem {
+		id: string;
+		dictTypeId: string;
+		label: string;
+		value: string;
+		sort: number;
+		status: 1 | 0;
+		desc: string;
+		createTime: string;
+	}
+
+	interface DictDataReq {
+		id?: string;
+		dictTypeId: string;
+		label: string;
+		value: string;
+		sort: number;
+		status: 1 | 0;
+		desc: string;
+	}
+
+	// 登录日志
+	interface LoginLogItem {
+		id: string;
+		username: string;
+		ip: string;
+		location: string;
+		browser: string;
+		os: string;
+		status: 1 | 0;
+		message: string;
+		loginTime: string;
+	}
+
+	// 操作日志
+	interface OperationLogItem {
+		id: string;
+		operator: string;
+		module: string;
+		action: string;
+		target: string;
+		ip: string;
+		status: 1 | 0;
+		detail: string;
+		operationTime: string;
+	}
+
+	// 网站配置
+	interface SiteConfigItem {
+		id: string;
+		siteName: string;
+		logo: string;
+		favicon: string;
+		keywords: string;
+		description: string;
+		copyright: string;
+		icp: string;
+		contactEmail: string;
+	}
+
 	// 通用分页响应
 	interface PageList<T> {
 		data: T[];

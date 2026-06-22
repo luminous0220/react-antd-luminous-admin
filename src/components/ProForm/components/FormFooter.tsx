@@ -8,11 +8,13 @@ export const FormFooter = memo(function FormFooter({
 	loading,
 	onConfirm,
 	onReset,
+	className,
 }: {
 	footer: NonNullable<ProFormProps["footer"]>;
 	loading: boolean;
 	onConfirm: () => void;
 	onReset: () => void;
+	className?: string;
 }) {
 	const {
 		confirmText = "确认",
@@ -24,7 +26,9 @@ export const FormFooter = memo(function FormFooter({
 
 	return (
 		<Form.Item className="mb-0">
-			<div className="flex items-center justify-end w-full gap-4">
+			<div
+				className={`flex items-center justify-end w-full gap-4 ${className}`}
+			>
 				{!hideReset && <Button onClick={onReset}>{resetText}</Button>}
 				{!hideConfirm && (
 					<Button
