@@ -302,6 +302,11 @@ export function ProTableInner<T>(
 			];
 		}
 
+		// 移动端去除所有列的固定定位，避免横向滚动时布局错乱
+		if (isMobile) {
+			result = result.map((col) => ({ ...col, fixed: undefined }));
+		}
+
 		return result as TableColumnType<T>[];
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
@@ -309,6 +314,7 @@ export function ProTableInner<T>(
 		columnConfigs,
 		dragSort,
 		index,
+		isMobile,
 		pagination.pageNumber,
 		pagination.pageSize,
 	]);
