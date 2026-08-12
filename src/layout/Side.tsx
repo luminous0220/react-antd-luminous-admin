@@ -6,7 +6,6 @@ import { CollapseProps } from "./TopHeader/CollapseButton";
 import { memo, useCallback, useMemo } from "react";
 import { useThemeStore } from "@/stores/theme";
 import { IconMap } from "@/libs";
-import { IconHelp } from "@tabler/icons-react";
 import type { IApi } from "@/apis";
 import { Logo } from "@/assets/Logo";
 
@@ -34,19 +33,6 @@ interface SideItem {
 /** 菜单项横向内边距（与分组标题左侧对齐） */
 const ITEM_PADDING_X = 12;
 
-/** 底部帮助中心菜单项（预定义常量，避免每次渲染创建新对象导致 memo 失效） */
-const HELP_ITEM: SideItem = {
-	key: "help",
-	title: "帮助中心",
-	depth: 0,
-	icon: <IconHelp stroke={1.5} />,
-};
-
-/** 帮助中心点击：弹提示（稳定引用，配合 React.memo） */
-const onHelpClick = () => {
-	window.$message.info("帮助文档即将上线");
-};
-
 /**
  * @description 递归收集分组下的菜单项（展平子菜单，深层级通过 depth 缩进）
  * @param children 子菜单列表
@@ -67,7 +53,7 @@ const SideHeader = ({ collapsed }: { collapsed?: boolean }) => {
 
 	return (
 		<div
-			className={`flex items-center pt-5 pb-4 ${
+			className={`flex items-center pt-5 pb-4 whitespace-nowrap ${
 				collapsed ? "justify-center" : "gap-3 px-4"
 			}`}
 		>
@@ -192,22 +178,6 @@ const MenuItem = memo(
 );
 
 /**
- * @description 底部帮助中心（固定吸附在侧边栏底部）
- */
-const SideFooter = ({ collapsed }: { collapsed?: boolean }) => {
-	return (
-		<footer className="mt-4 px-2 pb-2">
-			<MenuItem
-				item={HELP_ITEM}
-				active={false}
-				collapsed={collapsed}
-				onClick={onHelpClick}
-			/>
-		</footer>
-	);
-};
-
-/**
  * @description 侧边栏菜单组件（按设计稿 1:1 还原）
  * 布局：Logo 头部 / 分组标题 + 扁平菜单项 / 底部帮助中心
  * 支持折叠（仅图标 + Tooltip）与暗黑模式
@@ -272,11 +242,10 @@ export const Side = ({
 
 	return (
 		<aside
-			className={`flex flex-col h-full overflow-hidden absolute left-0 top-0 p-2 z-10 ${
-				collapsed ? " translate-y-[-50%] top-[50%]" : ""
-			} ${className ?? ""}`}
+			className={`flex flex-col h-full p-2 z-10  ${className ?? ""}`}
 			style={{
 				width: collapsed ? collapsedWidth : width,
+				minWidth: collapsed ? collapsedWidth : width,
 				backgroundColor: token.colorBgContainer,
 				transition:
 					"width 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease",
@@ -333,9 +302,6 @@ export const Side = ({
 							</div>
 						))}
 				</div>
-
-				{/* 底部帮助中心 */}
-				<SideFooter collapsed={collapsed} />
 			</div>
 		</aside>
 	);

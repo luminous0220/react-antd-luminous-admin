@@ -24,14 +24,10 @@ export const BaseLayout: React.FC = () => {
 
 	const sidebarWidth = 256;
 	const sidebarCollapsedWidth = 78;
-	const contentMarginLeft = isMobile
-		? 0
-		: collapsed
-			? sidebarCollapsedWidth
-			: sidebarWidth;
+
 
 	return (
-		<Layout className="size-full overflow-x-hidden relative">
+		<Layout className="size-full overflow-x-hidden flex flex-row">
 			{/* 侧边栏：从左侧滑入 */}
 			{isMobile ? (
 				<Drawer
@@ -40,13 +36,13 @@ export const BaseLayout: React.FC = () => {
 							padding: 0,
 						},
 					}}
-					size={240}
+					size={sidebarWidth}
 					placement={"left"}
 					closable={false}
 					onClose={onClose}
 					open={collapsed}
 				>
-					<Side width={240} />
+					<Side width={sidebarWidth} />
 				</Drawer>
 			) : (
 				<Side
@@ -58,11 +54,7 @@ export const BaseLayout: React.FC = () => {
 			)}
 
 			{/* 右侧主体：头部 + 内容，错峰入场 */}
-			<Layout
-				style={{
-					marginLeft: contentMarginLeft,
-				}}
-			>
+			<Layout>
 				<TopHeader collapsed={collapsed} setCollapsed={setCollapsed} />
 
 				<Content className="relative size-full">
@@ -73,7 +65,7 @@ export const BaseLayout: React.FC = () => {
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: 30 }}
 							transition={{ duration: 0.25, ease: "easeInOut" }}
-							className="size-full absolute left-0 top-0 overflow-y-auto p-2 md:px-6 md:pb-6 pb-0!"
+							className="size-full overflow-y-auto p-2 md:px-6 md:pb-6 pb-0!"
 							style={{
 								borderRadius: borderRadiusLG,
 							}}

@@ -5,10 +5,6 @@ export default {
 	plugins: [],
 	theme: {
 		extend: {
-			height: {
-				// 写法1：直接字符串写px ✅
-				header: "64px",
-			},
 		},
 	},
 };

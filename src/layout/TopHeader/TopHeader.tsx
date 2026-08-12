@@ -1,5 +1,13 @@
 import { Header } from "antd/es/layout/layout";
-import { Dropdown, Avatar, Space, Breadcrumb, AutoComplete, Input } from "antd";
+import {
+	Dropdown,
+	Avatar,
+	Space,
+	Breadcrumb,
+	AutoComplete,
+	Input,
+	theme,
+} from "antd";
 import { CollapseButton, CollapseProps } from "./CollapseButton";
 import { Setting } from "./Setting";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -88,10 +96,9 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 	const menus = useAuthStore((s) => s.menus);
 	const [searchText, setSearchText] = useState("");
 	const [inputFocused, setInputFocused] = useState(false);
-
+	const { token } = theme.useToken();
 	// 扁平化菜单（用于搜索）
 	const flatMenus = useMemo(() => flattenMenus(menus), [menus]);
-
 	// 面包屑
 	const breadcrumbItems = useMemo(() => {
 		const trail = findBreadcrumbTrail(menus, location.pathname);
@@ -173,10 +180,11 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 
 	return (
 		<Header
-			className="flex items-center justify-between h-header"
+			className="mt-4 w-[98%] mx-auto flex items-center justify-between h-[54px] shadow-soft backdrop-blur border relative z-[99]" 
 			style={{
 				padding: "0 16px",
-				background: "transparent",
+				backgroundColor: token.colorBgContainer,
+				borderRadius: "14px",
 			}}
 		>
 			{/* 左侧：折叠按钮 + 面包屑 + 搜索 */}
