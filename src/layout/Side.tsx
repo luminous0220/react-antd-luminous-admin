@@ -1,13 +1,14 @@
-import { Divider, Menu, theme } from "antd";
+import { Tooltip, theme } from "antd";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "@/stores/auth";
 import { CFG } from "@/constants";
 import { CollapseProps } from "./TopHeader/CollapseButton";
-import { useMemo, useState } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { useThemeStore } from "@/stores/theme";
-import { Logo } from "@/assets/Logo";
 import { IconMap } from "@/libs";
-import { motion } from "framer-motion";
+import { IconHelp } from "@tabler/icons-react";
+import type { IApi } from "@/apis";
+import { Logo } from "@/assets/Logo";
 
 interface ISideProps extends CollapseProps {
 	className?: string;
@@ -15,138 +16,327 @@ interface ISideProps extends CollapseProps {
 	collapsedWidth?: number;
 }
 
-// Logo 区域组件
-const LogoSection = ({ collapsed }: { collapsed?: boolean }) => {
-	const { colorVariants } = useThemeStore();
+/** 侧边栏菜单分组 */
+interface SideGroup {
+	key: string;
+	title: string;
+	items: SideItem[];
+}
+
+/** 侧边栏菜单项 */
+interface SideItem {
+	key: string;
+	title: string;
+	icon?: React.ReactNode;
+	depth: number;
+}
+
+/** 菜单项横向内边距（与分组标题左侧对齐） */
+const ITEM_PADDING_X = 12;
+
+/** 底部帮助中心菜单项（预定义常量，避免每次渲染创建新对象导致 memo 失效） */
+const HELP_ITEM: SideItem = {
+	key: "help",
+	title: "帮助中心",
+	depth: 0,
+	icon: <IconHelp stroke={1.5} />,
+};
+
+/** 帮助中心点击：弹提示（稳定引用，配合 React.memo） */
+const onHelpClick = () => {
+	window.$message.info("帮助文档即将上线");
+};
+
+/**
+ * @description 递归收集分组下的菜单项（展平子菜单，深层级通过 depth 缩进）
+ * @param children 子菜单列表
+ * @param depth 当前层级
+ */
+const collectItems = (children: IApi.MenuItem[], depth: number): SideItem[] =>
+	children.flatMap((child) => [
+		{ key: child.path, title: child.title, icon: IconMap[child.icon], depth },
+		...(child.children?.length ? collectItems(child.children, depth + 1) : []),
+	]);
+
+/**
+ * @description Logo 头部区域：主题色渐变圆角图标 + 系统名称/副标题
+ */
+const SideHeader = ({ collapsed }: { collapsed?: boolean }) => {
+	const colorVariants = useThemeStore((s) => s.colorVariants);
+	const { token } = theme.useToken();
 
 	return (
 		<div
-			className={`flex items-center justify-center h-[var(--top-height)] px-4 transition-colors ${
-				collapsed ? "flex-col" : "gap-3"
+			className={`flex items-center pt-5 pb-4 ${
+				collapsed ? "justify-center" : "gap-3 px-4"
 			}`}
 		>
-			{/* Logo - 使用主题色 */}
-			<Logo className="size-12" style={{ color: colorVariants.textPrimary }} />
-			{/* 系统标题 */}
+			{/* Logo 图标：主题色渐变圆角方块 + 品牌标识 */}
+			<div
+				className="size-[36px] shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#2577F5] to-[#4f93ff]"
+				style={{
+					boxShadow: `0 4px 12px ${colorVariants.lighter}`,
+				}}
+			>
+				<Logo className="!size-[24px]" />
+			</div>
+
+			{/* 系统名称 + 副标题 */}
 			{!collapsed && (
-				<span
-					className="text-[22px] font-semibold whitespace-nowrap"
-					style={{ color: colorVariants.textPrimary }}
-				>
-					{CFG.SYSTEM_NAME}
-				</span>
+				<div className="min-w-0">
+					<h2
+						className="text-[17px] font-semibold leading-none whitespace-nowrap overflow-hidden text-ellipsis"
+						style={{ color: token.colorText }}
+					>
+						{CFG.SYSTEM_NAME}
+					</h2>
+					<p
+						className="mt-1.5 text-xs"
+						style={{ color: token.colorTextTertiary }}
+					>
+						管理平台
+					</p>
+				</div>
 			)}
 		</div>
 	);
 };
 
 /**
- * @description 侧边栏菜单组件
- * 手风琴模式：同一时间只允许展开一个父菜单
+ * @description 菜单分组标题（贴合设计稿的灰色小标题）
+ */
+const GroupTitle = ({ title }: { title: string }) => {
+	const { token } = theme.useToken();
+
+	return (
+		<div
+			className="pt-3 pb-2 text-[11px] font-medium"
+			style={{
+				color: token.colorTextTertiary,
+				paddingLeft: ITEM_PADDING_X,
+				paddingRight: ITEM_PADDING_X,
+			}}
+		>
+			{title}
+		</div>
+	);
+};
+
+/**
+ * @description 单个菜单项：选中态为内缩圆角高亮块；折叠态仅显示图标 + Tooltip
+ * 使用 React.memo 缓存：仅当 props（item/active/collapsed/onClick）变化时才重新渲染，
+ * 避免点击菜单项导致整棵菜单树重渲染
+ */
+const MenuItem = memo(
+	({
+		item,
+		active,
+		collapsed,
+		onClick,
+	}: {
+		item: SideItem;
+		active: boolean;
+		collapsed?: boolean;
+		onClick: (key: string) => void;
+	}) => {
+		const colorVariants = useThemeStore((s) => s.colorVariants);
+		const { token } = theme.useToken();
+
+		// 折叠态：仅图标，居中对齐，hover 展示标题
+		if (collapsed) {
+			return (
+				<Tooltip placement="right" title={item.title}>
+					<button
+						onClick={() => onClick(item.key)}
+						className="flex items-center justify-center size-10 mx-auto rounded-xl transition-colors"
+						style={
+							active
+								? { backgroundColor: colorVariants.primary, color: "#fff" }
+								: { color: token.colorText }
+						}
+					>
+						<span className="text-[16px] leading-none">{item.icon}</span>
+					</button>
+				</Tooltip>
+			);
+		}
+
+		// 展开态：图标 + 文字，选中项为内缩圆角高亮块（贴合设计稿）
+		return (
+			<button
+				onClick={() => onClick(item.key)}
+				className={`flex items-center gap-2.5 w-full rounded-xl py-2.5 text-left transition-all duration-100 ${
+					active ? "" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+				}`}
+				style={{
+					paddingLeft: ITEM_PADDING_X,
+					paddingRight: ITEM_PADDING_X,
+					...(!active && { color: token.colorText }),
+					// 选中态：横向内缩 8px 的圆角高亮块
+					...(active && {
+						backgroundColor: colorVariants.primary,
+						color: "#fff",
+						boxShadow: `0 4px 12px ${colorVariants.lighter}`,
+					}),
+					// 深层级菜单缩进
+					...(item.depth >= 2 && {
+						paddingLeft: ITEM_PADDING_X + (item.depth - 1) * 8,
+					}),
+				}}
+			>
+				<span className="shrink-0 text-[14px] leading-none">{item.icon}</span>
+				<span className="text-sm truncate">{item.title}</span>
+			</button>
+		);
+	},
+);
+
+/**
+ * @description 底部帮助中心（固定吸附在侧边栏底部）
+ */
+const SideFooter = ({ collapsed }: { collapsed?: boolean }) => {
+	return (
+		<footer className="mt-4 px-2 pb-2">
+			<MenuItem
+				item={HELP_ITEM}
+				active={false}
+				collapsed={collapsed}
+				onClick={onHelpClick}
+			/>
+		</footer>
+	);
+};
+
+/**
+ * @description 侧边栏菜单组件（按设计稿 1:1 还原）
+ * 布局：Logo 头部 / 分组标题 + 扁平菜单项 / 底部帮助中心
+ * 支持折叠（仅图标 + Tooltip）与暗黑模式
  */
 export const Side = ({
+	className,
 	collapsed,
-	width = 228,
+	width = 256,
 	collapsedWidth = 64,
 }: ISideProps) => {
 	const location = useLocation();
 	const menus = useAuthStore((s) => s.menus);
 	const navigate = useNavigate();
 	const { token } = theme.useToken();
+	const isDark = useThemeStore((s) => s.isDark);
 
-	// 手风琴模式：只允许展开一个父菜单
-	const [openKeys, setOpenKeys] = useState<string[]>([]);
+	// 菜单分组：无子菜单的一级菜单归入「工作台」，有子菜单的一级菜单作为分组标题
+	const groups = useMemo(() => {
+		const result: SideGroup[] = [];
+		const workbench: SideItem[] = [];
 
-	// 计算 selectedKeys：支持一级菜单和子菜单的精确匹配
-	const selectedKeys = useMemo(() => {
-		const currentPath = location.pathname;
-		let matchedKey: string | null = null;
-
-		for (const item of menus) {
-			if (item.path === currentPath) {
-				matchedKey = item.path;
-				break;
-			}
-
-			if (item.children) {
-				for (const child of item.children) {
-					if (child.path === currentPath) {
-						matchedKey = child.path;
-						break;
-					}
-				}
-				if (matchedKey) break;
+		for (const top of menus) {
+			if (top.children?.length) {
+				result.push({
+					key: top.id,
+					title: top.title,
+					items: collectItems(top.children, 1),
+				});
+			} else {
+				workbench.push({
+					key: top.path,
+					title: top.title,
+					icon: IconMap[top.icon],
+					depth: 0,
+				});
 			}
 		}
 
-		return matchedKey ? [matchedKey] : [CFG.HOME_PATH];
-	}, [location.pathname, menus]);
+		if (workbench.length) {
+			result.unshift({ key: "workbench", title: "工作台", items: workbench });
+		}
 
-	// 转换菜单数据为 antd Menu items 格式
-	const menuItems = useMemo(
-		() =>
-			menus.map((item) => {
-				return {
-					key: item.path,
-					icon: IconMap[item.icon],
-					label: item.title,
-					children: item.children?.map((child) => ({
-						key: child.path,
-						icon: IconMap[child.icon],
-						label: child.title,
-					})),
-				};
-			}),
-		[menus],
+		return result;
+	}, [menus]);
+
+	// 当前选中项：精确匹配路径，兜底回首页
+	const selectedKey = useMemo(() => {
+		const allItems = groups.flatMap((group) => group.items);
+		const matched = allItems.find((item) => item.key === location.pathname);
+		return matched ? matched.key : CFG.HOME_PATH;
+	}, [location.pathname, groups]);
+
+	// 点击菜单项：若点击的是当前已选中项，则跳过导航。
+	// 避免重复 push 相同路由（产生冗余历史记录并触发无意义的重渲染导致卡顿）
+	const handleClick = useCallback(
+		(key: string) => {
+			if (key === selectedKey) return;
+			navigate(key);
+		},
+		[navigate, selectedKey],
 	);
 
 	return (
 		<aside
-			className={`h-full overflow-hidden absolute left-0 top-0 z-10 ${collapsed ? "h-[98%] translate-y-[-50%] top-[50%] left-2" : ""}`}
+			className={`flex flex-col h-full overflow-hidden absolute left-0 top-0 p-2 z-10 ${
+				collapsed ? " translate-y-[-50%] top-[50%]" : ""
+			} ${className ?? ""}`}
 			style={{
 				width: collapsed ? collapsedWidth : width,
 				backgroundColor: token.colorBgContainer,
-				transition: "width 0.3s ease",
+				transition:
+					"width 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease",
 				borderRight: `1px solid ${token.colorBorderSecondary}`,
-				borderRadius: collapsed ? "18px" : "0 18px 18px 0",
+				borderRadius: "0 20px 20px 0",
+				boxShadow: isDark
+					? "0 6px 24px rgba(0, 0, 0, 0.45)"
+					: "0 2px 12px rgba(0, 0, 0, 0.08)",
 			}}
 		>
-			{/* Logo 区域 */}
-
-			<LogoSection collapsed={collapsed} />
-
-			<Divider className="my-0 mb-2" />
-
-			{/* 菜单区域 */}
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.4, delay: 0.25, ease: "easeOut" }}
-				className="side-menu h-[calc(100%-var(--top-height))] overflow-y-auto overflow-x-hidden"
+			<div
+				className="border h-full"
+				style={{
+					borderRadius: "20px",
+					border: `1px solid ${token.colorBorderSecondary}`,
+				}}
 			>
-				<Menu
-					className="overflow-hidden w-full"
-					styles={{
-						root: {
-							transition: "none",
-							backgroundColor: token.colorBgContainer,
-						},
-					}}
-					mode="inline"
-					theme="light"
-					selectedKeys={selectedKeys}
-					openKeys={openKeys}
-					inlineCollapsed={collapsed}
-					onOpenChange={(keys) => {
-						// 手风琴模式：只保留最新展开的菜单
-						setOpenKeys(keys.length > 0 ? [keys[keys.length - 1]] : []);
-					}}
-					onClick={({ key }) => {
-						navigate(key);
-					}}
-					items={menuItems}
-				/>
-			</motion.div>
+				{/* Logo 头部 */}
+				<SideHeader collapsed={collapsed} />
+
+				{/* 菜单区域 */}
+				<div className="menu-wrap flex-1 h-[90%] overflow-y-auto overflow-x-hidden px-2 pb-2">
+					{/* 折叠态：仅图标 + Tooltip，不展示分组标题 */}
+					{collapsed &&
+						groups.map((group) => (
+							<div key={group.key} className="space-y-1">
+								{group.items.map((item) => (
+									<MenuItem
+										key={item.key}
+										item={item}
+										active={item.key === selectedKey}
+										collapsed
+										onClick={handleClick}
+									/>
+								))}
+							</div>
+						))}
+
+					{/* 展开态：分组标题 + 菜单项 */}
+					{!collapsed &&
+						groups.map((group) => (
+							<div key={group.key}>
+								<GroupTitle title={group.title} />
+								<div className="space-y-1">
+									{group.items.map((item) => (
+										<MenuItem
+											key={item.key}
+											item={item}
+											active={item.key === selectedKey}
+											onClick={handleClick}
+										/>
+									))}
+								</div>
+							</div>
+						))}
+				</div>
+
+				{/* 底部帮助中心 */}
+				<SideFooter collapsed={collapsed} />
+			</div>
 		</aside>
 	);
 };

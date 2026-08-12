@@ -1,7 +1,30 @@
 @layer tailwind-base, antd;
 
 @layer tailwind-base {
-  @tailwind base;
+	@tailwind base;
 }
 @tailwind components;
 @tailwind utilities;
+
+@layer utilities {
+	.flex-center {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.abs-center {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.text-shadow-primary {
+		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+	}
+
+	.dark .text-shadow-primary {
+		text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+	}
+}

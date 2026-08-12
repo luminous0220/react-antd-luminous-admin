@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 // 预设颜色配置
 export const PRESET_COLORS = {
-  blue: "#498ecf",
+  blue: "#427bff",
   orange: "#fa8c16",
   green: "#52c41a",
   purple: "#722ed1",

@@ -121,7 +121,7 @@ export interface TreeSelectorProps {
 	/** 是否禁用 */
 	disabled?: boolean;
 	/** 弹窗宽度，默认 1220 */
-	width?: number;
+	width?: number | string;
 	/** 自定义触发器 */
 	renderTrigger?: (props: SelectorTriggerRenderProps<TreeSelectorNode>) => ReactNode;
 }

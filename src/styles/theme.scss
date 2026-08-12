@@ -16,17 +16,19 @@
 	justify-content: center;
 }
 
-.side-menu {
-	.ant-menu-item-selected {
-		&::before {
-			content: "";
-			display: block;
-			width: 4px;
-			height: 100%;
-			background: var(--ant-color-primary-active);
-			position: absolute;
-			left: 0;
-			z-index: 999;
-		}
+.menu-wrap {
+	/* 更好看的滚动条  */
+	&::-webkit-scrollbar {
+		width: 2px;
+	}
+
+	&::-webkit-scrollbar-corner,
+/* 滚动条角落 */
+::-webkit-scrollbar-track {
+		border-radius: 4px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: rgba($color: #b7b2b2, $alpha: 0.3) !important;
 	}
 }

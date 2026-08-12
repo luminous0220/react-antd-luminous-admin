@@ -173,7 +173,7 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 
 	return (
 		<Header
-			className="flex items-center justify-between h-[var(--top-height)]"
+			className="flex items-center justify-between h-header"
 			style={{
 				padding: "0 16px",
 				background: "transparent",

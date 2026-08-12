@@ -1,55 +1,65 @@
 import React, { useMemo } from "react";
-import { Select, type SelectProps } from "antd";
+import { AutoComplete, Input } from "antd";
+import type { AutoCompleteProps } from "antd";
 import { IconMap } from "@/libs/iconMap";
 
 interface IconSelectProps extends Omit<
-	SelectProps,
-	"options" | "showSearch" | "filterOption" | "optionRender"
+	AutoCompleteProps,
+	"options" | "onChange" | "children" | "value" | "showSearch"
 > {
 	iconMap?: Record<string, React.ReactNode>;
+	/** 当前图标名称，支持任意自定义值（无需在 iconMap 中存在） */
+	value?: string;
+	/** 图标名称变化回调 */
+	onChange?: (value: string) => void;
 }
 
 export const IconSelect: React.FC<IconSelectProps> = ({
 	iconMap = IconMap,
+	value,
+	onChange,
 	...props
 }) => {
 	const options = useMemo(
 		() =>
 			Object.entries(iconMap).map(([key, node]) => ({
-				label: key,
 				value: key,
-				icon: node,
+				label: (
+					<div className="flex items-center gap-2">
+						<span className="flex items-center text-base">{node}</span>
+						<span className="text-xs text-gray-500">{key}</span>
+					</div>
+				),
 			})),
 		[iconMap],
 	);
 
+	// 当前值命中 iconMap 时，作为输入框前缀图标展示；自定义值（如 "Library"）则无前缀
+	const prefixIcon = value ? iconMap[value] : undefined;
+
 	return (
-		<Select
-			placeholder="搜索并选择图标"
+		<AutoComplete
+			placeholder="搜索或直接输入图标名称"
 			{...props}
+			value={value}
 			options={options}
 			showSearch={{
 				filterOption: (input, option) =>
-					(option?.label as string).toLowerCase().includes(input.toLowerCase()),
+					(option?.value as string)
+						?.toLowerCase()
+						.includes(input.toLowerCase()),
 			}}
-			labelRender={(props) => {
-				const Icon = iconMap[props.value as string];
-				return Icon ? (
-					<span className="flex items-center gap-1.5">
-						<span className="flex items-center text-base">{Icon}</span>
-						<span>{props.label}</span>
-					</span>
-				) : (
-					props.label
-				);
-			}}
-			optionRender={({ label, data }) => (
-				<div className="flex items-center gap-2">
-					<span className="flex items-center text-base">{data.icon}</span>
-					<span className="text-xs text-gray-500">{label}</span>
-				</div>
-			)}
-		/>
+			onChange={(v) => onChange?.(v)}
+		>
+			<Input
+				allowClear
+				prefix={
+					prefixIcon ? (
+						<span className="flex items-center text-base">{prefixIcon}</span>
+					) : null
+				}
+			/>
+		</AutoComplete>
 	);
 };
 

@@ -22,8 +22,8 @@ export const BaseLayout: React.FC = () => {
 		setCollapsed(false);
 	};
 
-	const sidebarWidth = 188;
-	const sidebarCollapsedWidth = 64;
+	const sidebarWidth = 256;
+	const sidebarCollapsedWidth = 78;
 	const contentMarginLeft = isMobile
 		? 0
 		: collapsed
@@ -40,13 +40,13 @@ export const BaseLayout: React.FC = () => {
 							padding: 0,
 						},
 					}}
-					size={228}
+					size={240}
 					placement={"left"}
 					closable={false}
 					onClose={onClose}
 					open={collapsed}
 				>
-					<Side width={228} />
+					<Side width={240} />
 				</Drawer>
 			) : (
 				<Side
