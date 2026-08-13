@@ -1,3 +1,43 @@
+/* ===================== 调整 Ant 组件样式 ===================== */
+
+.ant-btn-icon {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.ant-switch-inner-checked {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+}
+
+.ant-switch-inner-unchecked {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+}
+
+/* ===================== 侧边栏 ===================== */
+.side-menu-item-scroller {
+	/* 更好看的滚动条  */
+	&::-webkit-scrollbar {
+		width: 2px;
+	}
+
+	&::-webkit-scrollbar-corner,
+	/* 滚动条角落 */
+	::-webkit-scrollbar-track {
+		border-radius: 4px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: rgba($color: #b7b2b2, $alpha: 0.3) !important;
+	}
+}
+
+/* ===================== 动画类 ===================== */
+
 /* 浮动小卡片上下浮动动画 */
 @keyframes float {
 	0%,

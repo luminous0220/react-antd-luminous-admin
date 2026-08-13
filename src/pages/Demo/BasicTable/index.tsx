@@ -295,7 +295,13 @@ const formFields: FormFieldItem[] = [
 		type: "input",
 		name: "address",
 		label: "地址",
-		fieldProps: { placeholder: "请输入地址", allowClear: true },
+		formItemProps: {
+			className: "col-span-2",
+		},
+		fieldProps: {
+			placeholder: "请输入地址",
+			allowClear: true,
+		},
 	},
 ];
 
@@ -509,10 +515,7 @@ const BasicTable: React.FC = () => {
 	); // 依赖 openEditModal，它已被 useCallback 稳定
 
 	const handleConfirm = useCallback(
-		async (
-			title: string,
-			values: FormValues,
-		) => {
+		async (title: string, values: FormValues) => {
 			await new Promise((r) => setTimeout(r, 500));
 			const joinDateStr = values.joinDate
 				? dayjs(values.joinDate as string).format("YYYY-MM-DD")
@@ -539,13 +542,13 @@ const BasicTable: React.FC = () => {
 						search: searchConfig,
 						expandable: { expandedRowRender },
 						virtual: true,
-						scroll: { x: 1300 },
 					}
 				: {
 						api: mockApi,
 						search: searchConfig,
 						expandable: { expandedRowRender },
 						virtual: false,
+						scroll: { x: "max-content", y: "calc(100vh - 480px)" },
 					},
 		[virtualMode],
 	);
@@ -553,12 +556,6 @@ const BasicTable: React.FC = () => {
 	const toolbarExtra = useMemo(
 		() => (
 			<Space>
-				<Checkbox
-					checked={virtualMode}
-					onChange={(e) => setVirtualMode(e.target.checked)}
-				>
-					开启虚拟列表 (200条)
-				</Checkbox>
 				<Button
 					type="primary"
 					icon={<IconPlus size={16} />}
@@ -566,6 +563,12 @@ const BasicTable: React.FC = () => {
 				>
 					新增
 				</Button>
+				<Checkbox
+					checked={virtualMode}
+					onChange={(e) => setVirtualMode(e.target.checked)}
+				>
+					开启虚拟列表 (200条)
+				</Checkbox>
 			</Space>
 		),
 		[virtualMode, openAddModal],
@@ -590,8 +593,7 @@ const BasicTable: React.FC = () => {
 				type="modal"
 				fields={formFields}
 				width={900}
-				labelCol={{ style: { width: 80 } }}
-				className="grid grid-cols-2"
+				className="grid grid-cols-2 gap-x-4"
 				onConfirm={handleConfirm}
 			/>
 		</div>

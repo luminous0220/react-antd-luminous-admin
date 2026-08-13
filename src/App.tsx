@@ -19,6 +19,8 @@ const queryClient = new QueryClient({
 
 dayjs.locale("zh-cn");
 
+
+
 const App = () => {
 	const { isDark, colorPrimary } = useThemeStore();
 
@@ -36,15 +38,8 @@ const App = () => {
 						colorPrimary,
 						colorTextBase: isDark ? "#b1b1c7" : "#030229",
 						colorBgContainer: isDark ? "#161618" : "#FFFFFF",
-						colorBgLayout: isDark ? "#000000" : "#F5F5F5",
-					},
-					components: {
-						Menu: {
-							fontSize: 14,
-						},
-						Modal: {
-							borderRadiusLG: 32,
-						},
+						colorBgLayout: isDark ? "#000000" : "#F8FAFE",
+						borderRadius: 10,
 					},
 				}}
 			>

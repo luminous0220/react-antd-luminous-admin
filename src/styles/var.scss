@@ -1,0 +1,10 @@
+html {
+	--input-outline: rgb(226, 232, 240);
+	--input-hover-bg: rgba(0, 0, 0, 0.04);
+	--input-bg: #f8fafe;
+	.dark {
+		--input-outline: #424242;
+		--input-hover-bg: rgba(0, 0, 0, 0.2);
+		--input-bg: rgba(0, 0, 0, 0.2);
+	}
+}

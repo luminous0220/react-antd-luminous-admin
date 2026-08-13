@@ -100,9 +100,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 		const visibleCollapsedKeys = useMemo(() => {
 			if (!collapsible) return null;
 			return new Set(
-				visibleCollapsedFields.map((f) =>
-					getFieldKey(f, fields.indexOf(f)),
-				),
+				visibleCollapsedFields.map((f) => getFieldKey(f, fields.indexOf(f))),
 			);
 		}, [collapsible, visibleCollapsedFields, fields]);
 
@@ -240,7 +238,14 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 					);
 				})
 				.filter(Boolean);
-		}, [visibleInlineFields, fields, isInlineMode, form, collapsible, visibleCollapsedKeys]);
+		}, [
+			visibleInlineFields,
+			fields,
+			isInlineMode,
+			form,
+			collapsible,
+			visibleCollapsedKeys,
+		]);
 
 		// 渲染 footer
 		const renderedFooter = useMemo(() => {
@@ -328,7 +333,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			? "vertical"
 			: isInlineMode
 				? "inline"
-				: (formProps.layout ?? "horizontal");
+				: (formProps.layout ?? "vertical");
 
 		// 表单内容（纯表单部分，可能被 Modal/Drawer 包裹）
 		// topContent 渲染在 Form 上方，可通过外部 form 实例手动同步字段值
@@ -336,10 +341,8 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			<>
 				{topContent}
 				<Form
-					size="large"
 					form={form}
 					initialValues={normalizedInitialValues}
-					labelCol={{ style: { width: isMobile ? 220 : 90 } }}
 					className={isInlineMode ? "flex gap-x-2 gap-y-3" : ""}
 					{...formProps}
 					layout={layout}

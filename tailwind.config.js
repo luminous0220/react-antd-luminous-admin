@@ -5,6 +5,9 @@ export default {
 	plugins: [],
 	theme: {
 		extend: {
+			height: {
+				top: "54px",
+			},
 		},
 	},
 };

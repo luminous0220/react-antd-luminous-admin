@@ -11,6 +11,12 @@ export const DEFAULT_PAGE_SIZE = 20;
 /** 分页大小选项 */
 export const PAGE_SIZE_OPTIONS = [10, 20, 30, 50, 70, 100];
 
+/** 选择列宽度估算（rowSelection 自动生成的复选框列，antd 默认约 32~40） */
+export const SELECTION_COL_WIDTH = 40;
+
+/** 展开列宽度估算（expandedRowRender / 树形展开自动生成的图标列，antd 默认约 48） */
+export const EXPAND_COL_WIDTH = 48;
+
 /** 获取列的唯一 key */
 export function getColumnKey(
 	column: ProTableColumnType<any>,

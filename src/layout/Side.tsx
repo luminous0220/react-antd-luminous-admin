@@ -1,4 +1,4 @@
-import { Tooltip, theme } from "antd";
+import { Card, Tooltip, theme } from "antd";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "@/stores/auth";
 import { CFG } from "@/constants";
@@ -191,8 +191,6 @@ export const Side = ({
 	const location = useLocation();
 	const menus = useAuthStore((s) => s.menus);
 	const navigate = useNavigate();
-	const { token } = theme.useToken();
-	const isDark = useThemeStore((s) => s.isDark);
 
 	// 菜单分组：无子菜单的一级菜单归入「工作台」，有子菜单的一级菜单作为分组标题
 	const groups = useMemo(() => {
@@ -241,33 +239,33 @@ export const Side = ({
 	);
 
 	return (
-		<aside
-			className={`flex flex-col h-full p-2 z-10  ${className ?? ""}`}
+		<Card
+			className={`flex flex-col h-full border-none z-10 ${className ?? ""}`}
+			classNames={{
+				body: "!p-2 h-full",
+			}}
 			style={{
 				width: collapsed ? collapsedWidth : width,
 				minWidth: collapsed ? collapsedWidth : width,
-				backgroundColor: token.colorBgContainer,
 				transition:
-					"width 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease",
-				borderRight: `1px solid ${token.colorBorderSecondary}`,
+					"all 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease",
 				borderRadius: "0 20px 20px 0",
-				boxShadow: isDark
-					? "0 6px 24px rgba(0, 0, 0, 0.45)"
-					: "0 2px 12px rgba(0, 0, 0, 0.08)",
 			}}
 		>
-			<div
-				className="border h-full"
+			<Card
+				className="h-full"
+				classNames={{
+					body: "!p-0 h-full ",
+				}}
 				style={{
 					borderRadius: "20px",
-					border: `1px solid ${token.colorBorderSecondary}`,
 				}}
 			>
 				{/* Logo 头部 */}
 				<SideHeader collapsed={collapsed} />
 
 				{/* 菜单区域 */}
-				<div className="menu-wrap flex-1 h-[90%] overflow-y-auto overflow-x-hidden px-2 pb-2">
+				<div className="side-menu-item-scroller h-[calc(100%-78px)] flex-1 overflow-y-auto overflow-x-hidden px-2 pb-2">
 					{/* 折叠态：仅图标 + Tooltip，不展示分组标题 */}
 					{collapsed &&
 						groups.map((group) => (
@@ -302,7 +300,7 @@ export const Side = ({
 							</div>
 						))}
 				</div>
-			</div>
-		</aside>
+			</Card>
+		</Card>
 	);
 };

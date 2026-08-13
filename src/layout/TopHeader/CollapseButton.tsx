@@ -1,6 +1,6 @@
 import {
-  IconLayoutSidebarLeftExpand,
-  IconLayoutSidebarRightExpand,
+  IconLayoutSidebar,
+  IconLayoutSidebarRight,
 } from "@tabler/icons-react";
 import { Button } from "antd";
 import { useThemeStore } from "@/stores/theme";
@@ -29,9 +29,9 @@ export const CollapseButton = ({
       type="text"
       icon={
         collapsed ? (
-          <IconLayoutSidebarLeftExpand stroke={1} />
+          <IconLayoutSidebar className="size-5  " stroke={2} />
         ) : (
-          <IconLayoutSidebarRightExpand stroke={1} />
+          <IconLayoutSidebarRight className="size-5" stroke={2} />
         )
       }
       onClick={toggleCollapsed}

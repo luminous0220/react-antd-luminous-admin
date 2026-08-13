@@ -132,8 +132,8 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 			disabled: item.type === 1,
 			label: (
 				<div className="flex items-center gap-2 py-0.5">
-					<span className="text-gray-400">{IconMap[item.icon]}</span>
-					<span className="text-xs text-gray-400">{item.breadcrumbText}</span>
+					<span >{IconMap[item.icon]}</span>
+					<span className="text-xs ">{item.breadcrumbText}</span>
 				</div>
 			),
 		}));
@@ -179,65 +179,64 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 	];
 
 	return (
-		<Header
-			className="mt-4 w-[98%] mx-auto flex items-center justify-between h-[54px] shadow-soft backdrop-blur border relative z-[99]" 
-			style={{
-				padding: "0 16px",
-				backgroundColor: token.colorBgContainer,
-				borderRadius: "14px",
-			}}
-		>
-			{/* 左侧：折叠按钮 + 面包屑 + 搜索 */}
-			<div className="flex items-center gap-6 flex-1 min-w-0">
-				<CollapseButton collapsed={collapsed} setCollapsed={setCollapsed} />
+		<div className="w-full pt-4 relative z-[99] px-4">
+			<Header
+				className="flex h-top items-center justify-between shadow-soft-lg backdrop-blur "
+				style={{
+					padding: "0 16px",
+					backgroundColor: token.colorBgContainer,
+					borderRadius: "14px",
+				}}
+			>
+				{/* 左侧：折叠按钮 + 面包屑 + 搜索 */}
+				<div className="flex items-center gap-6 flex-1 min-w-0">
+					<CollapseButton collapsed={collapsed} setCollapsed={setCollapsed} />
 
-				<Breadcrumb className="shrink-0" items={breadcrumbItems} />
-
-				<AutoComplete
-					className="max-w-64 max-md:hidden"
-					options={searchOptions}
-					showSearch={{ onSearch: setSearchText }}
-					onSelect={handleSearchSelect}
-					onClear={() => setSearchText("")}
-					value={searchText}
-					open={inputFocused && searchOptions.length > 0 ? true : undefined}
-					style={{ lineHeight: "32px" }}
-					popupMatchSelectWidth={false}
-					getPopupContainer={(trigger) => trigger.parentElement!}
-				>
-					<Input.Search
-						size="large"
-						className="rounded-xl"
-						placeholder="搜索菜单..."
-						prefix={
-							<IconSearch size={14} stroke={1.5} className="text-gray-400" />
-						}
-						allowClear
-						onFocus={() => setInputFocused(true)}
-						onBlur={() => setInputFocused(false)}
-					/>
-				</AutoComplete>
-			</div>
-
-			{/* 右侧：主题切换 + 系统设置 + 用户头像（错峰淡入） */}
-			<div className="flex items-center gap-2">
-				<ThemeToggle />
-
-				<Setting />
-
-				<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-					<Space className="cursor-pointer">
-						<Avatar
-							size={32}
-							icon={<IconUser size={18} stroke={1} />}
-							style={{
-								cursor: "pointer",
-							}}
+					<AutoComplete
+						className="max-w-64 max-md:hidden"
+						options={searchOptions}
+						showSearch={{ onSearch: setSearchText }}
+						onSelect={handleSearchSelect}
+						onClear={() => setSearchText("")}
+						value={searchText}
+						open={inputFocused && searchOptions.length > 0 ? true : undefined}
+						popupMatchSelectWidth={false}
+						getPopupContainer={(trigger) => trigger.parentElement!}
+					>
+						<Input
+							className="h-[32px] w-[256px]"
+							placeholder="搜索菜单..."
+							prefix={
+								<IconSearch size={14} stroke={1.5} className="text-gray-400" />
+							}
+							allowClear
+							onFocus={() => setInputFocused(true)}
+							onBlur={() => setInputFocused(false)}
 						/>
-						<span className="hidden md:inline text-sm">{userInfo?.name}</span>
-					</Space>
-				</Dropdown>
-			</div>
-		</Header>
+					</AutoComplete>
+				</div>
+
+				{/* 右侧：主题切换 + 系统设置 + 用户头像（错峰淡入） */}
+				<div className="flex items-center gap-2">
+					<ThemeToggle />
+
+					<Setting />
+
+					<Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+						<Space className="cursor-pointer">
+							<Avatar
+								size={32}
+								icon={<IconUser size={18} stroke={1} />}
+								style={{
+									cursor: "pointer",
+								}}
+							/>
+							<span className="hidden md:inline text-sm">{userInfo?.name}</span>
+						</Space>
+					</Dropdown>
+				</div>
+			</Header>
+			<Breadcrumb className="mt-4 mb-2 shrink-0" items={breadcrumbItems} />
+		</div>
 	);
 };

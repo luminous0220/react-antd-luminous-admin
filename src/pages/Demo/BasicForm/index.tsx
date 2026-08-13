@@ -510,6 +510,7 @@ const BasicForm: React.FC = () => {
 						<p className="text-gray-500 text-sm mb-4">{c.description}</p>
 						<ProForm
 							type="pure"
+							layout="vertical"
 							fields={c.fields}
 							initialValues={c.initialValues}
 							collapsible={"collapsible" in c ? c.collapsible : undefined}

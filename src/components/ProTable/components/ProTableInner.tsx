@@ -21,6 +21,8 @@ import type {
 import {
 	DEFAULT_PAGE_SIZE,
 	PAGE_SIZE_OPTIONS,
+	SELECTION_COL_WIDTH,
+	EXPAND_COL_WIDTH,
 	getColumnKey,
 	initColumnConfigs,
 	getOrderedColumns,
@@ -452,6 +454,32 @@ export function ProTableInner<T>(
 		};
 	}, [onSelectRows, exportable, selectedRowKeys, handleRowSelectionChange]);
 
+	// 虚拟列表内容宽度：渲染列宽之和 + 选择列/展开列宽度（虚拟表格要求数值型 scroll.x，
+	// 字符串会被 VirtualTable 强转成 1 导致表格被截断）
+	const virtualScrollX = useMemo(() => {
+		const columnsWidth = renderedColumns.reduce(
+			(sum, col) => sum + (typeof col.width === "number" ? col.width : 0),
+			0,
+		);
+		return (
+			columnsWidth +
+			(rowSelectionConfig ? SELECTION_COL_WIDTH : 0) +
+			(restProps.expandable ? EXPAND_COL_WIDTH : 0)
+		);
+	}, [renderedColumns, rowSelectionConfig, restProps.expandable]);
+
+	// 合并滚动配置：虚拟列表强制数值型 scroll.x（有调用方传入时校验其类型），
+	// 其余场景沿用调用方配置或默认值
+	const mergedScroll = useMemo(() => {
+		if (restProps.virtual) {
+			const x = typeof scroll?.x === "number" ? scroll.x : virtualScrollX;
+			return { ...scroll, x };
+		}
+		if (scroll) return scroll;
+		if (isMobile) return { x: "max-content", y: "420px" };
+		return { y: "calc(100vh - 420px)" };
+	}, [scroll, isMobile, restProps.virtual, virtualScrollX]);
+
 	// 稳定的 Table props（无拖拽时的基础配置，拖拽时在此基础上覆盖 components）
 	const baseTableProps = useMemo(
 		() => ({
@@ -464,11 +492,7 @@ export function ProTableInner<T>(
 			size: density,
 			pagination: paginationConfig,
 			...(rowSelectionConfig ? { rowSelection: rowSelectionConfig } : {}),
-			scroll: scroll
-				? scroll
-				: isMobile
-					? { x: "max-content", y: "420px" }
-					: { y: "calc(100vh - 420px)" },
+			scroll: mergedScroll,
 		}),
 		[
 			restProps,
@@ -479,8 +503,7 @@ export function ProTableInner<T>(
 			density,
 			paginationConfig,
 			rowSelectionConfig,
-			scroll,
-			isMobile,
+			mergedScroll,
 		],
 	);
 

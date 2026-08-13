@@ -129,7 +129,7 @@ const StepForm: React.FC = () => {
 	return (
 		<Card className="max-w-[800px] mx-auto">
 			<Alert
-				message="转账业务说明"
+				title="转账业务说明"
 				description="请仔细核对收款人信息，转账成功后无法撤销。"
 				type="info"
 				showIcon
