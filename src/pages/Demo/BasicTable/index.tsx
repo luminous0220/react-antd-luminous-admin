@@ -553,7 +553,7 @@ const BasicTable: React.FC = () => {
 						search: searchConfig,
 						expandable: { expandedRowRender },
 						virtual: false,
-						scroll: { x: "max-content", y: "calc(100vh - 480px)" },
+						scroll: { x: "max-content", y: "calc(100vh - 420px)" },
 					},
 		[virtualMode],
 	);
