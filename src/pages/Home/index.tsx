@@ -232,9 +232,24 @@ const Home: React.FC = () => {
 
 	return (
 		<div className="space-y-4">
+			<div className="border text-card-foreground  overflow-hidden rounded-2xl border-[#eef4ff] bg-gradient-to-r from-[#E6F0FF] to-[#f8fafe] shadow-soft">
+				<div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
+					<div>
+						<h2 className="text-lg font-semibold text-[#1f2a44]">
+							欢迎回来，超级管理员 👋
+						</h2>
+						<p className="mt-1 text-sm text-[#7c8aa5]">
+							今天又是充满效率的一天，祝你工作顺利。
+						</p>
+					</div>
+					<div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl shadow-soft">
+						🐼
+					</div>
+				</div>
+			</div>
 			<Row gutter={[16, 16]}>
 				{statCards.map((item) => (
-					<Col xs={24} sm={12} md={8} lg={4} key={item.id}>
+					<Col xs={24} sm={12} md={8} lg={6} key={item.id}>
 						<StatCard data={item} colors={colors} />
 					</Col>
 				))}

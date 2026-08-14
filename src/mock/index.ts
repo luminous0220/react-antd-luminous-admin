@@ -1155,27 +1155,6 @@ const STAT_CARD_DATA = [
 		],
 	},
 	{
-		id: "4",
-		title: "转化率",
-		value: 14.2,
-		suffix: "%",
-		tooltip: "访问用户中实际完成下单的占比",
-		sparklineType: "progress",
-		sparklineData: [14.2],
-		sparklineColor: "#52c41a",
-	},
-	{
-		id: "5",
-		title: "活跃用户",
-		value: 32889,
-		tooltip: "统计周期内有操作行为的独立用户数",
-		sparklineType: "bar",
-		sparklineData: [
-			1200, 1100, 1350, 1250, 1400, 1300, 1450, 1380, 1500, 1420, 1520, 1480,
-			1460, 1400, 1550, 1500, 1580, 1520, 1600, 1550,
-		],
-	},
-	{
 		id: "6",
 		title: "平均客单价",
 		value: 126.5,

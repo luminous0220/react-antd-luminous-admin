@@ -10,6 +10,7 @@ export const Banner: React.FC<BannerProps> = ({
 	description,
 	buttonText,
 	img,
+	className,
 	onButtonClick,
 }) => {
 	const isDark = useThemeStore((s) => s.isDark);
@@ -17,7 +18,7 @@ export const Banner: React.FC<BannerProps> = ({
 
 	return (
 		<div
-			className="relative overflow-hidden rounded-2xl h-[220px] flex items-center cursor-pointer shadow-sm duration-300 transition-all hover:!shadow-md hover:scale-[1.03]"
+			className={`relative overflow-hidden rounded-2xl h-[220px] flex items-center cursor-pointer shadow-sm duration-300 transition-all hover:!shadow-md hover:scale-[1.03] ${className}`}
 			style={{
 				background: scheme.gradient,
 			}}

@@ -24,6 +24,7 @@ type PresetEntry = { light: ColorScheme; dark: ColorScheme };
 
 export interface BannerProps {
 	type?: BannerType;
+	className?: string;
 	title?: string;
 	description?: string;
 	buttonText?: string;

@@ -15,7 +15,7 @@ export const StatCard: React.FC<StatCardProps> = ({ data, colors }) => {
 	const chartRef = useEcharts(sparklineOption);
 
 	return (
-		<Card styles={{ body: { padding: "16px" } }} className="h-full">
+		<Card styles={{ body: { padding: "16px" } }}>
 			<div className="flex items-center gap-1 mb-1">
 				<Typography.Text type="secondary" className="text-md whitespace-nowrap">
 					{data.title}
@@ -46,8 +46,10 @@ export const StatCard: React.FC<StatCardProps> = ({ data, colors }) => {
 				/>
 			</Typography.Title>
 
-			<div ref={chartRef} style={{ height: 40, width: "100%" }} />
+			<div
+				ref={chartRef}
+				style={{ marginTop: "12px", height: 50, width: "100%" }}
+			/>
 		</Card>
 	);
 };
-

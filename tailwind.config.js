@@ -8,6 +8,10 @@ export default {
 			height: {
 				top: "54px",
 			},
+			boxShadow: {
+				soft: "0 2px 12px 0 rgba(37, 119, 245, 0.08)",
+				"soft-lg": "0 8px 30px 0 rgba(37, 119, 245, 0.10)",
+			},
 		},
 	},
 };
