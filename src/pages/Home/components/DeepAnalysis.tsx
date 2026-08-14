@@ -33,7 +33,7 @@ const DeepAnalysis: React.FC<DeepAnalysisProps> = ({ colors }) => {
 		() => ({
 			tooltip: {
 				trigger: "axis" as const,
-				backgroundColor: "transparent",
+				backgroundColor: "#fff",
 				formatter: (params: any) => {
 					const p = params[0];
 					return `<div style="color:${colors.textPrimary}">${p.axisValue}<br/>¥${p.data.toLocaleString()}</div>`;
@@ -63,10 +63,11 @@ const DeepAnalysis: React.FC<DeepAnalysisProps> = ({ colors }) => {
 					data: analysisData.map((d) => d.revenue),
 					barWidth: "60%",
 					itemStyle: {
-						borderRadius: [4, 4, 0, 0],
+						borderRadius: [12, 12, 0, 0],
+						// bg-gradient-to-t from-[#2577F5]/30 to-[#2577F5]/70 transition-all
 						color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-							{ offset: 0, color: colors.primary },
-							{ offset: 1, color: colors.primaryLighter },
+							{ offset: 0, color: "rgb(37 119 245 / 0.7)" },
+							{ offset: 1, color: "rgb(37 119 245 / 0.3)" },
 						]),
 					},
 				},

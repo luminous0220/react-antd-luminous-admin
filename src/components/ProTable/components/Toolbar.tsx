@@ -11,6 +11,7 @@ import type { ProTableDensity, ProTableToolbarProps } from "../types.d";
 import { TableDragSort } from "./TableDragSort";
 
 export const Toolbar = memo(function Toolbar({
+	title,
 	toolbarExtra,
 	density,
 	onDensityChange,
@@ -30,8 +31,8 @@ export const Toolbar = memo(function Toolbar({
 	];
 
 	return (
-		<div className="flex items-center justify-between py-2 shrink-0 gap-2 flex-wrap">
-			{/* <div className="flex items-center gap-2 min-w-0">
+		<div className="flex items-center justify-between mb-3 shrink-0 gap-2 flex-wrap ">
+			<div className="flex items-center gap-2 min-w-0">
 				{title && (
 					<span
 						className={`text-base font-medium whitespace-nowrap ${
@@ -41,12 +42,11 @@ export const Toolbar = memo(function Toolbar({
 						{title}
 					</span>
 				)}
-			</div> */}
-			{toolbarExtra}
-
+			</div>
 			<div
 				className={`flex items-center gap-1.5  ${isMobile ? "flex-wrap	" : ""}`}
 			>
+				{toolbarExtra}
 				{exportable && (
 					<Button
 						icon={<IconDownload size={18} stroke={1.5} />}

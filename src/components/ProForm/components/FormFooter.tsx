@@ -10,7 +10,7 @@ export const FormFooter = memo(function FormFooter({
 	onReset,
 	className,
 }: {
-	footer: NonNullable<ProFormProps["footer"]>;
+	footer: NonNullable<ProFormProps["defaultButtons"]>;
 	loading: boolean;
 	onConfirm: () => void;
 	onReset: () => void;

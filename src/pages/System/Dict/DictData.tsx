@@ -14,6 +14,7 @@ import type {
 } from "@/components/ProForm";
 import { Api } from "@/apis";
 import type { IApi } from "@/apis";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 /**
  * @description 字典数据子表组件 Props
@@ -145,8 +146,10 @@ const DictData: React.FC<DictDataProps> = ({ dictType, onBack }) => {
 				render: (_: unknown, record: IApi.DictDataItem) => (
 					<Space>
 						<Button
-							type="link"
 							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
 							onClick={() => openEditData(record)}
 						>
 							编辑
@@ -155,7 +158,12 @@ const DictData: React.FC<DictDataProps> = ({ dictType, onBack }) => {
 							title="确定删除？"
 							onConfirm={() => handleDeleteData(record.id)}
 						>
-							<Button type="link" size="small" danger>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
 								删除
 							</Button>
 						</Popconfirm>
@@ -245,10 +253,7 @@ const DictData: React.FC<DictDataProps> = ({ dictType, onBack }) => {
 		<div className="flex flex-col gap-4">
 			{/* 顶部返回栏 */}
 			<div className="flex items-center gap-3">
-				<Button
-					icon={<IconArrowLeft size={16} />}
-					onClick={onBack}
-				>
+				<Button icon={<IconArrowLeft size={16} />} onClick={onBack}>
 					返回类型列表
 				</Button>
 				<span className="text-base text-[var(--ant-color-text-secondary)]">

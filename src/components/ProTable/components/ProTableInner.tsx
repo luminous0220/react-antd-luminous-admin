@@ -40,6 +40,7 @@ import {
 import { Toolbar } from "./Toolbar";
 import { SelectedInfo } from "./SelectedInfo";
 import { DragHandle, SortableRow } from "./DragSortRow";
+import { SearchOutlined } from "@ant-design/icons";
 
 export function ProTableInner<T>(
 	props: ProTableProps<T>,
@@ -51,7 +52,7 @@ export function ProTableInner<T>(
 		title,
 		toolbarExtra,
 		index = true,
-		indexWidth = 60,
+		indexWidth = 80,
 		onSelectRows,
 		onPageChange,
 		columns = [],
@@ -525,7 +526,7 @@ export function ProTableInner<T>(
 		<>
 			{/* 筛选表单 */}
 			{search && (
-				<Card className="mb-2">
+				<Card className="mb-2" classNames={{ body: "!p-4 !px-6" }}>
 					<ProForm
 						type="pure"
 						form={searchForm}
@@ -538,9 +539,10 @@ export function ProTableInner<T>(
 							defaultShowCount: search.defaultShowCount ?? 6,
 						}}
 						disabled={loading}
-						footer={{
+						defaultButtons={{
 							confirmText: "查询",
 							resetText: "重置",
+							confirmIcon: <SearchOutlined />,
 						}}
 						onConfirm={async (_, values: Record<string, unknown>) => {
 							handleSearch(values);
@@ -549,7 +551,7 @@ export function ProTableInner<T>(
 				</Card>
 			)}
 
-			<Card className="flex flex-col">
+			<Card className="flex flex-col" classNames={{ body: "!p-4 !px-6" }}>
 				{/* 工具栏 */}
 				<Toolbar
 					title={title}

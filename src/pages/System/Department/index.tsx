@@ -1,11 +1,22 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import React, {
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+	useEffect,
+} from "react";
 import { Tag, Button, Space, Popconfirm, Switch, Table, Card } from "antd";
 import type { TableProps } from "antd";
 import { IconPlus } from "@tabler/icons-react";
 import { ProForm } from "@/components/ProForm";
-import type { ProFormInstance, FormFieldItem, FormValues } from "@/components/ProForm";
+import type {
+	ProFormInstance,
+	FormFieldItem,
+	FormValues,
+} from "@/components/ProForm";
 import { Api } from "@/apis";
 import type { IApi } from "@/apis";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 /**
  * @description 将扁平部门列表转为树形结构
@@ -70,13 +81,20 @@ const Department: React.FC = () => {
 
 	// 表单确认回调
 	const handleConfirm = useCallback(
-		async (title: string, values: FormValues, extraParams?: Record<string, any>) => {
+		async (
+			title: string,
+			values: FormValues,
+			extraParams?: Record<string, any>,
+		) => {
 			const payload = { ...values, status: values.status ? 1 : 0 };
 			if (title?.includes("新增")) {
 				await Api.saveDepartment(payload as IApi.DepartmentReq);
 				window.$message?.success?.("新增成功");
 			} else {
-				await Api.saveDepartment({ ...payload, id: extraParams?.id } as IApi.DepartmentReq);
+				await Api.saveDepartment({
+					...payload,
+					id: extraParams?.id,
+				} as IApi.DepartmentReq);
 				window.$message?.success?.("编辑成功");
 			}
 			loadTree();
@@ -84,16 +102,24 @@ const Department: React.FC = () => {
 		[loadTree],
 	);
 
-	const handleDelete = useCallback(async (id: string) => {
-		await Api.deleteDepartment(id);
-		window.$message?.success?.("删除成功");
-		loadTree();
-	}, [loadTree]);
+	const handleDelete = useCallback(
+		async (id: string) => {
+			await Api.deleteDepartment(id);
+			window.$message?.success?.("删除成功");
+			loadTree();
+		},
+		[loadTree],
+	);
 
 	const handleStatusChange = useCallback(
 		async (record: IApi.DepartmentItem, checked: boolean) => {
-			await Api.saveDepartment({ ...record, status: checked ? 1 : 0 } as IApi.DepartmentReq);
-			window.$message?.success?.(`已${checked ? "启用" : "禁用"}: ${record.name}`);
+			await Api.saveDepartment({
+				...record,
+				status: checked ? 1 : 0,
+			} as IApi.DepartmentReq);
+			window.$message?.success?.(
+				`已${checked ? "启用" : "禁用"}: ${record.name}`,
+			);
 			loadTree();
 		},
 		[loadTree],
@@ -102,38 +128,89 @@ const Department: React.FC = () => {
 	const columns: TableProps<IApi.DepartmentItem>["columns"] = useMemo(
 		() => [
 			{
-				title: "部门名称", dataIndex: "name", key: "name", width: 200,
+				title: "部门名称",
+				dataIndex: "name",
+				key: "name",
+				width: 200,
 				render: (v: string) => <Tag color="blue">{v}</Tag>,
 			},
 			{
-				title: "部门编码", dataIndex: "code", key: "code", width: 150,
+				title: "部门编码",
+				dataIndex: "code",
+				key: "code",
+				width: 150,
 				render: (v: string) => <Tag>{v}</Tag>,
 			},
 			{
-				title: "排序", dataIndex: "sort", key: "sort", width: 70, align: "center",
+				title: "排序",
+				dataIndex: "sort",
+				key: "sort",
+				width: 70,
+				align: "center",
 			},
 			{
-				title: "状态", dataIndex: "status", key: "status", width: 80, align: "center",
+				title: "状态",
+				dataIndex: "status",
+				key: "status",
+				width: 80,
+				align: "center",
 				render: (_: unknown, record: IApi.DepartmentItem) => (
-					<Switch size="small" checked={record.status === 1} onChange={(c) => handleStatusChange(record, c)} />
+					<Switch
+						size="small"
+						checked={record.status === 1}
+						onChange={(c) => handleStatusChange(record, c)}
+					/>
 				),
 			},
 			{
-				title: "描述", dataIndex: "desc", key: "desc", width: 200, ellipsis: true,
+				title: "描述",
+				dataIndex: "desc",
+				key: "desc",
+				width: 200,
+				ellipsis: true,
 			},
 			{
-				title: "创建时间", dataIndex: "createTime", key: "createTime", width: 160,
+				title: "创建时间",
+				dataIndex: "createTime",
+				key: "createTime",
+				width: 160,
 			},
 			{
-				title: "操作", key: "actions", width: 200, fixed: "right",
+				title: "操作",
+				key: "actions",
+				width: 200,
+				fixed: "right",
 				render: (_: unknown, record: IApi.DepartmentItem) => (
 					<Space>
-						<Button type="link" size="small" icon={<IconPlus size={14} />} onClick={() => openAdd(record)}>
+						<Button
+							type="link"
+							size="small"
+							icon={<IconPlus size={14} />}
+							onClick={() => openAdd(record)}
+						>
 							新增
 						</Button>
-						<Button type="link" size="small" onClick={() => openEdit(record)}>编辑</Button>
-						<Popconfirm title="确定删除？" onConfirm={() => handleDelete(record.id)}>
-							<Button type="link" size="small" danger>删除</Button>
+						<Button
+							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
+							onClick={() => openEdit(record)}
+						>
+							编辑
+						</Button>
+						<Popconfirm
+							title="确定删除？"
+							onConfirm={() => handleDelete(record.id)}
+						>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
+								删除
+							</Button>
 						</Popconfirm>
 					</Space>
 				),
@@ -144,11 +221,46 @@ const Department: React.FC = () => {
 
 	const formFields: FormFieldItem[] = useMemo(
 		() => [
-			{ type: "input", name: "name", label: "部门名称", formItemProps: { rules: [{ required: true, message: "请输入部门名称" }] }, fieldProps: { placeholder: "如: 技术部", allowClear: true } },
-			{ type: "input", name: "code", label: "部门编码", formItemProps: { rules: [{ required: true, message: "请输入部门编码" }] }, fieldProps: { placeholder: "如: tech", allowClear: true } },
-			{ type: "input-number", name: "sort", label: "排序", fieldProps: { placeholder: "数字越小越靠前", min: 1, style: { width: "100%" } } },
-			{ type: "switch", name: "status", label: "启用状态", fieldProps: { checkedChildren: "启用", unCheckedChildren: "禁用" } },
-			{ type: "textarea", name: "desc", label: "描述", fieldProps: { placeholder: "部门描述", rows: 2, allowClear: true } },
+			{
+				type: "input",
+				name: "name",
+				label: "部门名称",
+				formItemProps: {
+					rules: [{ required: true, message: "请输入部门名称" }],
+				},
+				fieldProps: { placeholder: "如: 技术部", allowClear: true },
+			},
+			{
+				type: "input",
+				name: "code",
+				label: "部门编码",
+				formItemProps: {
+					rules: [{ required: true, message: "请输入部门编码" }],
+				},
+				fieldProps: { placeholder: "如: tech", allowClear: true },
+			},
+			{
+				type: "input-number",
+				name: "sort",
+				label: "排序",
+				fieldProps: {
+					placeholder: "数字越小越靠前",
+					min: 1,
+					style: { width: "100%" },
+				},
+			},
+			{
+				type: "switch",
+				name: "status",
+				label: "启用状态",
+				fieldProps: { checkedChildren: "启用", unCheckedChildren: "禁用" },
+			},
+			{
+				type: "textarea",
+				name: "desc",
+				label: "描述",
+				fieldProps: { placeholder: "部门描述", rows: 2, allowClear: true },
+			},
 		],
 		[],
 	);
@@ -159,7 +271,11 @@ const Department: React.FC = () => {
 				title="部门管理"
 				classNames={{ header: "!bg-[var(--ant-color-bg-layout)]" }}
 				extra={
-					<Button type="primary" icon={<IconPlus size={16} />} onClick={() => openAdd()}>
+					<Button
+						type="primary"
+						icon={<IconPlus size={16} />}
+						onClick={() => openAdd()}
+					>
 						新增根部门
 					</Button>
 				}
@@ -176,7 +292,12 @@ const Department: React.FC = () => {
 				/>
 			</Card>
 
-			<ProForm ref={modalRef} type="modal" fields={formFields} onConfirm={handleConfirm} />
+			<ProForm
+				ref={modalRef}
+				type="modal"
+				fields={formFields}
+				onConfirm={handleConfirm}
+			/>
 		</div>
 	);
 };

@@ -17,6 +17,7 @@ import { Api } from "@/apis";
 import type { IApi } from "@/apis";
 import { AnimatePresence, motion } from "framer-motion";
 import DictData from "./DictData";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const typeSearchConfig: ProTableSearchConfig = {
 	fields: [
@@ -174,16 +175,19 @@ const Dict: React.FC = () => {
 				render: (_: unknown, record: IApi.DictTypeItem) => (
 					<Space>
 						<Button
-							type="link"
 							size="small"
+							color="cyan"
+							variant="filled"
 							icon={<IconList size={14} />}
 							onClick={() => setSelectedType(record)}
 						>
 							数据
 						</Button>
 						<Button
-							type="link"
 							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
 							onClick={() => openEditType(record)}
 						>
 							编辑
@@ -192,7 +196,12 @@ const Dict: React.FC = () => {
 							title="确定删除？"
 							onConfirm={() => handleDeleteType(record.id)}
 						>
-							<Button type="link" size="small" danger>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
 								删除
 							</Button>
 						</Popconfirm>

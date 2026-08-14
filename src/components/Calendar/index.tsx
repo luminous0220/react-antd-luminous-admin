@@ -78,28 +78,31 @@ export const Calendar: React.FC = () => {
 
 	// ── Form open helpers ──────────────────────────────────────────
 
-	const openAddForm = useCallback((dateStr: string) => {
-		setFormDate(dateStr);
-		setEditingReminder(null);
-		const now = dayjs();
-		formRef.current?.open({
-			title: (
-				<span>
-					<span>新增提醒：</span>
-					<span className="text-red-400">
-						{dayjs(dateStr).format("YYYY年MM月DD日")}
+	const openAddForm = useCallback(
+		(dateStr: string) => {
+			setFormDate(dateStr);
+			setEditingReminder(null);
+			const now = dayjs();
+			formRef.current?.open({
+				title: (
+					<span>
+						<span>新增提醒：</span>
+						<span className="text-red-400">
+							{dayjs(dateStr).format("YYYY年MM月DD日")}
+						</span>
 					</span>
-				</span>
-			),
-			initialValues: {
-				title: "",
-				note: "",
-				dateTime: dayjs(dateStr).hour(now.hour()).minute(now.minute()),
-				color: DEFAULT_REMINDER_COLOR,
-				sort: reminders.length + 1,
-			},
-		});
-	}, [reminders.length]);
+				),
+				initialValues: {
+					title: "",
+					note: "",
+					dateTime: dayjs(dateStr).hour(now.hour()).minute(now.minute()),
+					color: DEFAULT_REMINDER_COLOR,
+					sort: reminders.length + 1,
+				},
+			});
+		},
+		[reminders.length],
+	);
 
 	const openEditForm = useCallback((reminder: CalendarReminder) => {
 		const dateStr = dayjs(reminder.dateTime).format("YYYY-MM-DD");
@@ -397,33 +400,33 @@ export const Calendar: React.FC = () => {
 				ref={formRef}
 				type="modal"
 				fields={formFields}
-				footer={null}
+				defaultButtons={null}
 				destroyOnHidden
 				onClose={closeForm}
-				labelCol={{ span: 4 }}
 				className="mt-4"
-			>
-				<div style={{ marginTop: 8, textAlign: "right" }}>
-					{editingReminder && (
+				footer={
+					<div style={{ marginTop: 8, textAlign: "right" }}>
+						{editingReminder && (
+							<Button
+								size="large"
+								danger
+								onClick={handleFormDelete}
+								style={{ marginRight: 8 }}
+							>
+								删除
+							</Button>
+						)}
 						<Button
 							size="large"
-							danger
-							onClick={handleFormDelete}
-							style={{ marginRight: 8 }}
+							type="primary"
+							color={editingReminder ? "pink" : "primary"}
+							onClick={handleFormSubmit}
 						>
-							删除
+							{editingReminder ? "编辑" : "新增"}
 						</Button>
-					)}
-					<Button
-						size="large"
-						variant="solid"
-						color={editingReminder ? "pink" : "primary"}
-						onClick={handleFormSubmit}
-					>
-						{editingReminder ? "编辑" : "新增"}
-					</Button>
-				</div>
-			</ProForm>
+					</div>
+				}
+			></ProForm>
 		</Card>
 	);
 };

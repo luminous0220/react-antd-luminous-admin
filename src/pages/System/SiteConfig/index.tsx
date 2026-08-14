@@ -27,7 +27,7 @@ const SiteConfig: React.FC = () => {
 		try {
 			const values = await formRef.current?.validate?.();
 			if (values) {
-				await Api.saveSiteConfig(values as IApi.SiteConfigItem);
+				await Api.saveSiteConfig(values as any);
 				window.$message?.success?.("网站配置保存成功");
 			}
 		} catch {
@@ -69,8 +69,7 @@ const SiteConfig: React.FC = () => {
 					ref={formRef}
 					type="pure"
 					fields={formFields}
-					footer={null}
-					labelCol={{ style: { width: 110 } }}
+					defaultButtons={null}
 				/>
 			</Card>
 		</div>

@@ -393,7 +393,6 @@ const case4Fields: ProFormFields = [
 		},
 		formItemProps: {
 			labelAlign: "left",
-			labelCol: { style: { width: 150 } },
 		},
 	},
 	{

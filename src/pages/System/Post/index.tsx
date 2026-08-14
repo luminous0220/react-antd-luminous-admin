@@ -15,6 +15,7 @@ import type {
 } from "@/components/ProForm";
 import { Api } from "@/apis";
 import type { IApi } from "@/apis";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const searchConfig: ProTableSearchConfig = {
 	fields: [
@@ -61,7 +62,11 @@ const Post: React.FC = () => {
 	}, []);
 
 	const handleConfirm = useCallback(
-		async (title: string, values: FormValues, extraParams?: Record<string, any>) => {
+		async (
+			title: string,
+			values: FormValues,
+			extraParams?: Record<string, any>,
+		) => {
 			const payload = { ...values, status: values.status ? 1 : 0 };
 			if (title === "新增岗位") {
 				await Api.savePost(payload as IApi.PostReq);
@@ -83,8 +88,13 @@ const Post: React.FC = () => {
 
 	const handleStatusChange = useCallback(
 		async (record: IApi.PostItem, checked: boolean) => {
-			await Api.savePost({ ...record, status: checked ? 1 : 0 } as IApi.PostReq);
-			window.$message?.success?.(`已${checked ? "启用" : "禁用"}: ${record.name}`);
+			await Api.savePost({
+				...record,
+				status: checked ? 1 : 0,
+			} as IApi.PostReq);
+			window.$message?.success?.(
+				`已${checked ? "启用" : "禁用"}: ${record.name}`,
+			);
 			setRefreshKey((k) => k + 1);
 		},
 		[],
@@ -93,29 +103,84 @@ const Post: React.FC = () => {
 	const columns: ProTableColumnType<IApi.PostItem>[] = useMemo(
 		() => [
 			{
-				title: "岗位名称", dataIndex: "name", key: "name", width: 130,
+				title: "岗位名称",
+				dataIndex: "name",
+				key: "name",
+				width: 130,
 				render: (v: string) => <Tag color="blue">{v}</Tag>,
 			},
 			{
-				title: "岗位编码", dataIndex: "code", key: "code", width: 140,
+				title: "岗位编码",
+				dataIndex: "code",
+				key: "code",
+				width: 140,
 				render: (v: string) => <Tag>{v}</Tag>,
 			},
-			{ title: "排序", dataIndex: "sort", key: "sort", width: 70, align: "center" },
 			{
-				title: "状态", dataIndex: "status", key: "status", width: 80, align: "center", hideable: false,
+				title: "排序",
+				dataIndex: "sort",
+				key: "sort",
+				width: 70,
+				align: "center",
+			},
+			{
+				title: "状态",
+				dataIndex: "status",
+				key: "status",
+				width: 80,
+				align: "center",
+				hideable: false,
 				render: (_: unknown, record: IApi.PostItem) => (
-					<Switch size="small" checked={record.status === 1} onChange={(c) => handleStatusChange(record, c)} />
+					<Switch
+						size="small"
+						checked={record.status === 1}
+						onChange={(c) => handleStatusChange(record, c)}
+					/>
 				),
 			},
-			{ title: "描述", dataIndex: "desc", key: "desc", width: 240, ellipsis: true },
-			{ title: "创建时间", dataIndex: "createTime", key: "createTime", width: 160 },
 			{
-				title: "操作", key: "actions", width: 150, fixed: "right", hideable: false, fixable: false,
+				title: "描述",
+				dataIndex: "desc",
+				key: "desc",
+				width: 240,
+				ellipsis: true,
+			},
+			{
+				title: "创建时间",
+				dataIndex: "createTime",
+				key: "createTime",
+				width: 160,
+			},
+			{
+				title: "操作",
+				key: "actions",
+				width: 150,
+				fixed: "right",
+				hideable: false,
+				fixable: false,
 				render: (_: unknown, record: IApi.PostItem) => (
 					<Space>
-						<Button type="link" size="small" onClick={() => openEdit(record)}>编辑</Button>
-						<Popconfirm title="确定删除？" onConfirm={() => handleDelete(record.id)}>
-							<Button type="link" size="small" danger>删除</Button>
+						<Button
+							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
+							onClick={() => openEdit(record)}
+						>
+							编辑
+						</Button>
+						<Popconfirm
+							title="确定删除？"
+							onConfirm={() => handleDelete(record.id)}
+						>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
+								删除
+							</Button>
 						</Popconfirm>
 					</Space>
 				),
@@ -127,50 +192,78 @@ const Post: React.FC = () => {
 	const formFields: FormFieldItem[] = useMemo(
 		() => [
 			{
-				type: "input", name: "name", label: "岗位名称",
-				formItemProps: { rules: [{ required: true, message: "请输入岗位名称" }] },
+				type: "input",
+				name: "name",
+				label: "岗位名称",
+				formItemProps: {
+					rules: [{ required: true, message: "请输入岗位名称" }],
+				},
 				fieldProps: { placeholder: "如: 部门经理", allowClear: true },
 			},
 			{
-				type: "input", name: "code", label: "岗位编码",
-				formItemProps: { rules: [{ required: true, message: "请输入岗位编码" }] },
+				type: "input",
+				name: "code",
+				label: "岗位编码",
+				formItemProps: {
+					rules: [{ required: true, message: "请输入岗位编码" }],
+				},
 				fieldProps: { placeholder: "如: manager", allowClear: true },
 			},
 			{
-				type: "input-number", name: "sort", label: "排序",
-				fieldProps: { placeholder: "数字越小越靠前", min: 1, style: { width: "100%" } },
+				type: "input-number",
+				name: "sort",
+				label: "排序",
+				fieldProps: {
+					placeholder: "数字越小越靠前",
+					min: 1,
+					style: { width: "100%" },
+				},
 			},
 			{
-				type: "switch", name: "status", label: "启用状态",
+				type: "switch",
+				name: "status",
+				label: "启用状态",
 				fieldProps: { checkedChildren: "启用", unCheckedChildren: "禁用" },
 			},
 			{
-				type: "textarea", name: "desc", label: "描述",
+				type: "textarea",
+				name: "desc",
+				label: "描述",
 				fieldProps: { placeholder: "岗位描述", rows: 2, allowClear: true },
 			},
 		],
 		[],
 	);
 
-	const tableProps: ProTableProps<IApi.PostItem> = useMemo(() => ({
-		key: refreshKey,
-		title: "岗位管理",
-		rowKey: "id" as const,
-		columns,
-		search: searchConfig,
-		api: async (params) => {
-			const res = await Api.getPostList(params);
-			return { data: res.data, total: res.total };
-		},
-		toolbarExtra: (
-			<Button type="primary" icon={<IconPlus size={16} />} onClick={openAdd}>新增岗位</Button>
-		),
-	}), [refreshKey, columns, openAdd]);
+	const tableProps: ProTableProps<IApi.PostItem> = useMemo(
+		() => ({
+			key: refreshKey,
+			title: "岗位管理",
+			rowKey: "id" as const,
+			columns,
+			search: searchConfig,
+			api: async (params) => {
+				const res = await Api.getPostList(params);
+				return { data: res.data, total: res.total };
+			},
+			toolbarExtra: (
+				<Button type="primary" icon={<IconPlus size={16} />} onClick={openAdd}>
+					新增岗位
+				</Button>
+			),
+		}),
+		[refreshKey, columns, openAdd],
+	);
 
 	return (
 		<div className="flex flex-col gap-4">
 			<ProTable<IApi.PostItem> {...tableProps} />
-			<ProForm ref={modalRef} type="modal" fields={formFields} onConfirm={handleConfirm} />
+			<ProForm
+				ref={modalRef}
+				type="modal"
+				fields={formFields}
+				onConfirm={handleConfirm}
+			/>
 		</div>
 	);
 };

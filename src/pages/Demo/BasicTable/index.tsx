@@ -27,6 +27,7 @@ import type {
 	FormValues,
 } from "@/components/ProForm";
 import dayjs from "dayjs";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 interface DemoRecord {
 	id: number;
@@ -482,8 +483,10 @@ const BasicTable: React.FC = () => {
 				render: (_: unknown, record: DemoRecord) => (
 					<Space>
 						<Button
-							type="link"
 							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
 							onClick={(e) => {
 								e.stopPropagation();
 								openEditModal(record); // ✅ 直接调用稳定化的函数
@@ -499,9 +502,10 @@ const BasicTable: React.FC = () => {
 							}}
 						>
 							<Button
-								type="link"
 								size="small"
-								danger
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
 								onClick={(e) => e.stopPropagation()}
 							>
 								删除
@@ -542,6 +546,7 @@ const BasicTable: React.FC = () => {
 						search: searchConfig,
 						expandable: { expandedRowRender },
 						virtual: true,
+						scroll: { y: "calc(100vh - 480px)" },
 					}
 				: {
 						api: mockApi,
@@ -567,7 +572,7 @@ const BasicTable: React.FC = () => {
 					checked={virtualMode}
 					onChange={(e) => setVirtualMode(e.target.checked)}
 				>
-					开启虚拟列表 (200条)
+					开启虚拟列表
 				</Checkbox>
 			</Space>
 		),

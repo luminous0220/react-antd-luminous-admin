@@ -90,12 +90,15 @@ type FormFieldItem<T extends ComponentType = ComponentType> =
 type ProFormFields = FormFieldItem[];
 
 /** Footer 按钮配置 */
-type ProFormFooter = {
+type ProFormDefaultButtons = {
 	confirmText?: string;
 	resetText?: string;
+	confirmStyle?: ButtonProps;
+	resetStyle?: ButtonProps;
+	confirmIcon?: React.ReactNode;
+	resetIcon?: React.ReactNode;
 	hideConfirm?: boolean;
 	hideReset?: boolean;
-	confirmStyle?: ButtonProps;
 };
 
 /** 折叠配置 */
@@ -112,7 +115,8 @@ type ProFormProps = Omit<FormProps, "fields" | "title" | "onFinish"> & {
 	/** 字段配置数组 */
 	fields: ProFormFields;
 	/** Footer 按钮配置 */
-	footer?: ProFormFooter | null;
+	defaultButtons?: ProFormDefaultButtons | null;
+	footer?: React.ReactNode;
 	/** 提交回调，extraParams 为 open() 传入的额外参数 */
 	onConfirm?: (
 		title: string,
@@ -170,7 +174,7 @@ export type {
 	CustomFieldConfig,
 	FormFieldItem,
 	ProFormFields,
-	ProFormFooter,
+	ProFormDefaultButtons,
 	ProFormCollapseConfig,
 	ProFormProps,
 	ProFormInstance,

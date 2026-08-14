@@ -494,7 +494,7 @@ const Login = () => {
 									ref={formRef}
 									fields={formItems}
 									layout="vertical"
-									footer={null}
+									defaultButtons={null}
 									autoComplete="off"
 									size="large"
 								/>

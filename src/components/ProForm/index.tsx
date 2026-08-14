@@ -43,7 +43,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			title,
 			fields,
 			topContent,
-			footer,
+			defaultButtons,
 			onConfirm,
 			initialValues,
 			collapsible,
@@ -52,6 +52,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			width,
 			destroyOnHidden = false,
 			onClose,
+			footer,
 			children,
 			...formProps
 		} = props;
@@ -249,14 +250,17 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 
 		// 渲染 footer
 		const renderedFooter = useMemo(() => {
-			if (footer === null) return null;
+			if (defaultButtons === null) return null;
 
-			const _footer = footer ?? {
+			const _defaultButtons = defaultButtons ?? {
 				confirmText: "确认",
 				resetText: "重置",
+				confirmIcon: null,
+				resetIcon: null,
 				hideConfirm: false,
 				hideReset: false,
 				confirmStyle: {},
+				resetStyle: {},
 			};
 
 			// 折叠切换按钮（独立于 inline 模式）
@@ -282,20 +286,27 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 				return (
 					<div className="flex items-center gap-2 shrink-0 mt-2 ml-4 md:mt-0">
 						<div className="flex items-center justify-end w-full gap-4">
-							{!_footer.hideReset && (
-								<Button onClick={handleReset} disabled={loading}>
-									{_footer.resetText ?? "重置"}
+							{!_defaultButtons.hideReset && (
+								<Button
+									{..._defaultButtons.resetStyle}
+									loading={loading}
+									icon={_defaultButtons.resetIcon}
+									onClick={handleReset}
+									disabled={loading}
+								>
+									{_defaultButtons.resetText ?? "重置"}
 								</Button>
 							)}
-							{!_footer.hideConfirm && (
+							{!_defaultButtons.hideConfirm && (
 								<Button
 									type="primary"
-									{..._footer.confirmStyle}
+									{..._defaultButtons.confirmStyle}
+									icon={_defaultButtons.confirmIcon}
 									loading={loading}
 									onClick={handleConfirm}
 									disabled={loading}
 								>
-									{_footer.confirmText ?? "确认"}
+									{_defaultButtons.confirmText ?? "确认"}
 								</Button>
 							)}
 							{collapseToggle}
@@ -307,7 +318,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			return (
 				<>
 					<FormFooter
-						footer={_footer}
+						footer={_defaultButtons}
 						loading={loading}
 						onConfirm={handleConfirm}
 						onReset={handleReset}
@@ -318,7 +329,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 				</>
 			);
 		}, [
-			footer,
+			defaultButtons,
 			loading,
 			handleConfirm,
 			handleReset,
@@ -369,6 +380,48 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 					size={width ?? 520}
 					destroyOnHidden={destroyOnHidden}
 					footer={
+						footer ? (
+							footer
+						) : (
+							<div className="grid grid-cols-2 gap-4">
+								<Button
+									loading={loading}
+									disabled={loading}
+									size="large"
+									onClick={handleReset}
+								>
+									重置
+								</Button>
+								<Button
+									loading={loading}
+									disabled={loading}
+									size="large"
+									type="primary"
+									onClick={handleConfirm}
+								>
+									提交
+								</Button>
+							</div>
+						)
+					}
+				>
+					{formContent}
+				</Drawer>
+			);
+		}
+
+		// modal 模式（默认）：包裹 ProModal
+		return (
+			<ProModal
+				open={isOpen}
+				onCancel={close}
+				title={title ? title : modalTitle}
+				width={width}
+				destroyOnHidden={destroyOnHidden}
+				footer={
+					footer ? (
+						footer
+					) : (
 						<div className="grid grid-cols-2 gap-4">
 							<Button
 								loading={loading}
@@ -388,41 +441,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 								提交
 							</Button>
 						</div>
-					}
-				>
-					{formContent}
-				</Drawer>
-			);
-		}
-
-		// modal 模式（默认）：包裹 ProModal
-		return (
-			<ProModal
-				open={isOpen}
-				onCancel={close}
-				title={title ? title : modalTitle}
-				width={width}
-				destroyOnHidden={destroyOnHidden}
-				footer={
-					<div className="grid grid-cols-2 gap-4">
-						<Button
-							loading={loading}
-							disabled={loading}
-							size="large"
-							onClick={handleReset}
-						>
-							重置
-						</Button>
-						<Button
-							loading={loading}
-							disabled={loading}
-							size="large"
-							type="primary"
-							onClick={handleConfirm}
-						>
-							提交
-						</Button>
-					</div>
+					)
 				}
 			>
 				{formContent}

@@ -15,6 +15,7 @@ import type {
 } from "@/components/ProForm";
 import { Api } from "@/apis";
 import type { IApi } from "@/apis";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const ROLE_MAP: Record<string, string> = {
 	admin: "管理员",
@@ -184,14 +185,25 @@ const UserManagement: React.FC = () => {
 				fixable: false,
 				render: (_: unknown, record: IApi.UserItem) => (
 					<Space>
-						<Button type="link" size="small" onClick={() => openEdit(record)}>
+						<Button
+							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
+							onClick={() => openEdit(record)}
+						>
 							编辑
 						</Button>
 						<Popconfirm
 							title="确定删除？"
 							onConfirm={() => handleDelete(record.id)}
 						>
-							<Button type="link" size="small" danger>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
 								删除
 							</Button>
 						</Popconfirm>

@@ -52,9 +52,14 @@ export function AppRouter() {
 		]);
 	}, [dynamicRoutes]);
 
+	// 路由签名：菜单路由变化时生成新的 key，强制重挂载 RouterProvider。
+	// RouterProvider 内部状态仅在首次挂载时记录，router 实例更换后不会自动同步，
+	// 若沿用旧状态会按新路由树重新映射，导致刷新后误渲染首页，故路由变化时需整树重建。
+	const routerKey = dynamicRoutes.map((r) => r.path).join(",");
+
 	return (
 		<Suspense fallback={<Spin className="size-full flex-center" />}>
-			<RouterProvider router={router} />
+			<RouterProvider key={routerKey} router={router} />
 		</Suspense>
 	);
 }

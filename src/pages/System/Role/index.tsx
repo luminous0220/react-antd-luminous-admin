@@ -20,6 +20,7 @@ import {
 } from "@/components/ModalSelector";
 import { Api } from "@/apis";
 import type { IApi } from "@/apis";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const searchConfig: ProTableSearchConfig = {
 	fields: [
@@ -123,31 +124,28 @@ const Role: React.FC = () => {
 	);
 
 	// 打开权限弹窗（记住 roleId 后调用 TreeSelectorModal）
-	const handleOpenPermission = useCallback(
-		async (record: IApi.RoleItem) => {
-			currentRoleIdRef.current = record.id;
-			try {
-				const [menuTree, permissions] = await Promise.all([
-					Api.getMenuList(),
-					Api.getRolePermissions(record.id),
-				]);
-				const treeData = transformMenuToTreeData(menuTree);
-				const checkedKeys = permissions.menuIds.map((id) => ({
-					value: id,
-					title: "",
-					type: "child" as const,
-				}));
-				treeModalRef.current?.open({
-					title: `设置权限 - ${record.name}`,
-					treeData,
-					checkedKeys,
-				});
-			} catch {
-				window.$message?.error?.("获取菜单数据失败");
-			}
-		},
-		[],
-	);
+	const handleOpenPermission = useCallback(async (record: IApi.RoleItem) => {
+		currentRoleIdRef.current = record.id;
+		try {
+			const [menuTree, permissions] = await Promise.all([
+				Api.getMenuList(),
+				Api.getRolePermissions(record.id),
+			]);
+			const treeData = transformMenuToTreeData(menuTree);
+			const checkedKeys = permissions.menuIds.map((id) => ({
+				value: id,
+				title: "",
+				type: "child" as const,
+			}));
+			treeModalRef.current?.open({
+				title: `设置权限 - ${record.name}`,
+				treeData,
+				checkedKeys,
+			});
+		} catch {
+			window.$message?.error?.("获取菜单数据失败");
+		}
+	}, []);
 
 	const handleDelete = useCallback(async (id: string) => {
 		await Api.deleteRole(id);
@@ -230,21 +228,33 @@ const Role: React.FC = () => {
 				render: (_: unknown, record: IApi.RoleItem) => (
 					<Space>
 						<Button
-							type="link"
 							size="small"
+							color="purple"
+							variant="filled"
 							icon={<IconSettings size={14} />}
 							onClick={() => handleOpenPermission(record)}
 						>
 							设置权限
 						</Button>
-						<Button type="link" size="small" onClick={() => openEdit(record)}>
+						<Button
+							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
+							onClick={() => openEdit(record)}
+						>
 							编辑
 						</Button>
 						<Popconfirm
 							title="确定删除？"
 							onConfirm={() => handleDelete(record.id)}
 						>
-							<Button type="link" size="small" danger>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
 								删除
 							</Button>
 						</Popconfirm>

@@ -26,6 +26,7 @@ import { Api } from "@/apis";
 import type { IApi } from "@/apis";
 import { IconMap, TablerIconMap } from "@/libs/iconMap";
 import { cleanEmptyChildren } from "@/libs";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 const TYPE_MAP: Record<number, string> = { 1: "目录", 2: "菜单" };
 const TYPE_COLORS: Record<number, string> = { 1: "cyan", 2: "blue" };
@@ -213,14 +214,25 @@ const Menu: React.FC = () => {
 				fixable: false,
 				render: (_: unknown, record: IApi.MenuItem) => (
 					<Space>
-						<Button type="link" size="small" onClick={() => openEdit(record)}>
+						<Button
+							size="small"
+							color="primary"
+							variant="filled"
+							icon={<EditOutlined />}
+							onClick={() => openEdit(record)}
+						>
 							编辑
 						</Button>
 						<Popconfirm
 							title="确定删除？"
 							onConfirm={() => handleDelete(record.id)}
 						>
-							<Button type="link" size="small" danger>
+							<Button
+								size="small"
+								color="danger"
+								icon={<DeleteOutlined />}
+								variant="filled"
+							>
 								删除
 							</Button>
 						</Popconfirm>
@@ -364,7 +376,6 @@ const Menu: React.FC = () => {
 				fields={formFields}
 				topContent={topContent}
 				width={700}
-				labelCol={{ style: { width: 90 } }}
 				onConfirm={handleConfirm}
 			/>
 		</div>
