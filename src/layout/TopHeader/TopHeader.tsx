@@ -226,8 +226,9 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 						<Space className="cursor-pointer">
 							<Avatar
 								size={32}
-								icon={<IconUser size={18} stroke={1} />}
+								icon={<>🐼</>}
 								style={{
+									background:"#EAF3FF",
 									cursor: "pointer",
 								}}
 							/>

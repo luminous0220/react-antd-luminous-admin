@@ -7,7 +7,6 @@ import { memo, useCallback, useMemo } from "react";
 import { useThemeStore } from "@/stores/theme";
 import { IconMap } from "@/libs";
 import type { IApi } from "@/apis";
-import { Logo } from "@/assets/Logo";
 
 interface ISideProps extends CollapseProps {
 	className?: string;
@@ -64,7 +63,7 @@ const SideHeader = ({ collapsed }: { collapsed?: boolean }) => {
 					boxShadow: `0 4px 12px ${colorVariants.lighter}`,
 				}}
 			>
-				<Logo className="!size-[24px]" />
+				🐼
 			</div>
 
 			{/* 系统名称 + 副标题 */}

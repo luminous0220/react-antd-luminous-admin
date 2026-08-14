@@ -78,6 +78,7 @@ const Login = () => {
 			name: "loginName",
 			label: "账号",
 			type: "input",
+
 			rules: ["required"],
 			fieldProps: {
 				placeholder: "请输入用户名",
@@ -213,14 +214,7 @@ const Login = () => {
 								borderColor: colorVariants.borderLight,
 							}}
 						>
-							<svg
-								viewBox="0 0 24 24"
-								className="w-8 h-8"
-								fill="currentColor"
-								style={{ color: colorVariants.primary }}
-							>
-								<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-							</svg>
+							🐼
 						</div>
 						<span
 							className="text-xl font-semibold"
@@ -490,6 +484,10 @@ const Login = () => {
 								transition={{ ...fadeUp.transition, delay: 0.2 }}
 							>
 								<ProForm
+									initialValues={{
+										loginName: "admin",
+										loginPwd: "123456",
+									}}
 									type="pure"
 									ref={formRef}
 									fields={formItems}

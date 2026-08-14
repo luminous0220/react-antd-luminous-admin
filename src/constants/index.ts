@@ -3,7 +3,7 @@ export const CFG = {
 	HOME_PATH: "/home",
 	LOGIN_PATH: "/login",
 	REMEMBER_KEY: "REMEMBER_LOGIN_INFO",
-	SYSTEM_NAME: "Luminous",
+	SYSTEM_NAME: "LMAdmin",
 	AXIOS_TIME_OUT: 30 * 1000,
 };
 

@@ -232,10 +232,10 @@ const Home: React.FC = () => {
 
 	return (
 		<div className="space-y-4">
-			<div className="border text-card-foreground  overflow-hidden rounded-2xl border-[#eef4ff] bg-gradient-to-r from-[#E6F0FF] to-[#f8fafe] shadow-soft">
+			<div className="overflow-hidden rounded-2xl  bg-gradient-to-r from-[#E6F0FF] to-[#f8fafe] shadow-soft dark:from-[rgb(37,119,245,0.3)] dark:to-[rgb(37,119,245,0.1)]">
 				<div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
 					<div>
-						<h2 className="text-lg font-semibold text-[#1f2a44]">
+						<h2 className="text-lg font-semibold text-[#1f2a44] dark:text-white">
 							欢迎回来，超级管理员 👋
 						</h2>
 						<p className="mt-1 text-sm text-[#7c8aa5]">

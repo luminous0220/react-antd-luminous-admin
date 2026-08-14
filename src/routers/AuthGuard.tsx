@@ -4,9 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 import { getToken, removeToken } from "@/libs/storage";
 import { CFG } from "@/constants";
 import { Api } from "@/apis";
-import { Spin } from "antd";
 import { filterAndSortMenus } from "./utils";
-
 interface AuthGuardProps {
 	children: React.ReactNode;
 }
@@ -64,7 +62,8 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
 	// 全屏 loading
 	if (loading) {
-		return <Spin fullscreen description="页面加载中..." />;
+		// <Spin fullscreen description="页面加载中..." />
+		return <img src="../../public/loading.svg" className="size-[50%] abs-center" alt="图标"></img>;
 	}
 
 	// 未登录，跳转登录页
