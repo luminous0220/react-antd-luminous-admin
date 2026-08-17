@@ -9,11 +9,11 @@ interface RankingListProps {
 
 const medalColors = (rank: number, colors: ChartColorSet) => {
 	if (rank === 1)
-		return { bg: "#D6336C", color: "#fff" };
+		return { bg: "#F48F68", color: "#fff" };
 	if (rank === 2)
-		return { bg: "#FF4082", color: "#fff" };
+		return { bg: "#FFE394", color: "#fff" };
 	if (rank === 3)
-		return { bg: "#FFB6C2", color: "#fff" };
+		return { bg: "#8CDFDD", color: "#fff" };
 	return { bg: "transparent", color: colors.textSecondary };
 };
 

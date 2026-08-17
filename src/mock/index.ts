@@ -11,7 +11,7 @@ const MOCK_MENUS_TREE = [
 		sort: 1,
 		parentId: null,
 		path: "/home",
-		icon: "HomeFilled",
+		icon: "HomeOutlined",
 		componentPath: "/Home",
 		status: 1,
 		permission: "",

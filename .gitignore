@@ -1,3 +1,31 @@
-/.DS_Store
-/dist
+# dependencies
 /node_modules
+
+# build output
+/dist
+
+# logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# editor
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# env local（保留 .env.development 等共享配置）
+.env.local
+.env.*.local
+
+# TypeScript 增量编译缓存
+*.tsbuildinfo
+
+# misc
+*.local

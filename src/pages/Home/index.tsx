@@ -22,7 +22,6 @@ const Home: React.FC = () => {
 		[dashboard],
 	);
 	const donutData = useMemo(() => dashboard?.donut ?? [], [dashboard]);
-	const gaugeValue = useMemo(() => dashboard?.gaugeValue ?? 0, [dashboard]);
 	const lineData = useMemo(() => dashboard?.lineData ?? [], [dashboard]);
 
 	const horizontalBarOption = useMemo(
@@ -148,44 +147,6 @@ const Home: React.FC = () => {
 		};
 	}, [donutData, colors]);
 
-	const gaugeOption = useMemo(
-		() => ({
-			series: [
-				{
-					type: "gauge" as const,
-					startAngle: 210,
-					endAngle: -30,
-					center: ["50%", "55%"],
-					radius: "85%",
-					min: 0,
-					max: 100,
-					axisLine: {
-						lineStyle: {
-							color: [
-								[0.3, "#91CC75"],
-								[0.7, "#FF9F40"],
-								[1, "#FA5400"],
-							] as [number, string][],
-						},
-					},
-					pointer: {
-						length: "60%",
-						width: 8,
-						itemStyle: { color: "auto" },
-					},
-					detail: {
-						valueAnimation: true,
-						formatter: "{value}%",
-						fontSize: 28,
-						offsetCenter: [0, "55%"],
-					},
-					data: [{ value: gaugeValue }],
-				},
-			],
-		}),
-		[gaugeValue],
-	);
-
 	const areaLineOption = useMemo(
 		() => ({
 			tooltip: {
@@ -267,15 +228,7 @@ const Home: React.FC = () => {
 			</Row>
 
 			<Row gutter={[16, 16]}>
-				<Col xs={24} lg={8}>
-					<Chart
-						type="card"
-						title="业绩目标完成率"
-						option={gaugeOption}
-						height={280}
-					/>
-				</Col>
-				<Col xs={24} lg={16}>
+				<Col xs={24} lg={24}>
 					<Chart
 						type="card"
 						title="实时销售额趋势"
