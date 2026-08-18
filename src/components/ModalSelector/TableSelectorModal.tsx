@@ -72,6 +72,55 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 		});
 	}, []);
 
+	// 点击行切换勾选：checkbox 模式点击切换，radio 模式点击直接选中该行
+	const toggleRow = useCallback(
+		(record: T) => {
+			const value = (record as any)[rowKey];
+			const nextKeys = isRadio
+				? [value]
+				: modalCheckedKeys.includes(value)
+					? modalCheckedKeys.filter((k) => k !== value)
+					: [...modalCheckedKeys, value];
+
+			setModalCheckedKeys(nextKeys);
+			setModalItemCache((prev) => {
+				const next = { ...prev };
+				const keySet = new Set(nextKeys.map(String));
+				// 移除不再选中的行
+				for (const k of Object.keys(next)) {
+					if (!keySet.has(String(k))) delete next[k];
+				}
+				// 写入点击行的缓存
+				next[String(value)] = {
+					value,
+					title: (record as any)[labelKey] ?? String(value),
+					desc: (record as any)[descKey],
+				};
+				return next;
+			});
+		},
+		[isRadio, modalCheckedKeys, rowKey, labelKey, descKey],
+	);
+
+	// 行点击事件：跳过勾选列/按钮/链接等交互元素，避免与复选框点击或单元格内交互冲突
+	const onRow = useCallback(
+		(record: T) => ({
+			className: "cursor-pointer",
+			onClick: (event: React.MouseEvent) => {
+				const target = event.target as HTMLElement;
+				if (
+					target.closest(
+						".ant-table-selection-column, .ant-checkbox, .ant-radio, button, a, input, .ant-table-row-expand-icon",
+					)
+				) {
+					return;
+				}
+				toggleRow(record);
+			},
+		}),
+		[toggleRow],
+	);
+
 	const rowSelection = useMemo(() => {
 		const radio = selectionType === "radio";
 		return {
@@ -128,6 +177,7 @@ function TableSelectorModalInner<T extends Record<string, any> = Record<string, 
 		columns: columns as ProTableColumnType<T>[],
 		rowKey,
 		rowSelection,
+		onRow,
 		index: true,
 		scroll: restTableProps.scroll ?? { y: 360 },
 	};

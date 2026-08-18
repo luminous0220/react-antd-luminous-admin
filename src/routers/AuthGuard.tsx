@@ -63,7 +63,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 	// 全屏 loading
 	if (loading) {
 		// <Spin fullscreen description="页面加载中..." />
-		return <img src="../../public/loading.svg" className="size-[50%] abs-center" alt="图标"></img>;
+		return <img src="../../public/loading.svg" className="size-[25%] abs-center" alt="图标"></img>;
 	}
 
 	// 未登录，跳转登录页

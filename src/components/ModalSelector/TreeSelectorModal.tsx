@@ -30,7 +30,10 @@ import {
 	buildSelectedFromKeys,
 	getAncestorKeys,
 } from "./utils";
-
+import {
+	CaretDownOutlined,
+	CaretRightOutlined,
+} from "@ant-design/icons";
 export type {
 	TreeSelectorModalOpenProps,
 	TreeSelectorModalRef,
@@ -117,13 +120,13 @@ function TreeSelectorModalInner(
 		setSearchText("");
 	}, [modalCheckedKeys, treeData, onConfirm]);
 
-	const handleTreeCheck = useCallback(
-		(checkedKeys: any, info: any) => {
-			const { node, checked } = info;
-			const key = node.key;
-			const currentKeys: React.Key[] = Array.isArray(checkedKeys)
-				? checkedKeys
-				: ((checkedKeys as { checked: React.Key[] }).checked ?? []);
+	/**
+	 * 纯函数：在 currentKeys 基础上勾选/取消 key，返回新的 keys。
+	 * 勾选时联动选中子孙与祖先，取消时按「父节点仅在无其他已选子节点时才取消」的规则回退。
+	 * 勾选框与 label 点击共用此逻辑，保证二者行为一致。
+	 */
+	const applyCheck = useCallback(
+		(currentKeys: React.Key[], key: React.Key, checked: boolean) => {
 			let newKeys = [...currentKeys];
 
 			if (checked) {
@@ -183,9 +186,33 @@ function TreeSelectorModalInner(
 					}
 				}
 			}
-			setModalCheckedKeys(newKeys);
+			return newKeys;
 		},
 		[treeData],
+	);
+
+	const handleTreeCheck = useCallback(
+		(checkedKeys: any, info: any) => {
+			const { node, checked } = info;
+			const key = node.key;
+			const currentKeys: React.Key[] = Array.isArray(checkedKeys)
+				? checkedKeys
+				: ((checkedKeys as { checked: React.Key[] }).checked ?? []);
+			setModalCheckedKeys(applyCheck(currentKeys, key, checked));
+		},
+		[applyCheck],
+	);
+
+	// 点击节点 label 时切换勾选状态（复用与勾选框一致的联动逻辑）
+	const handleNodeTitleClick = useCallback(
+		(nodeData: TreeNodeData) => {
+			const key = nodeData.value;
+			setModalCheckedKeys((prev) => {
+				const isChecked = prev.includes(key);
+				return applyCheck(prev, key, !isChecked);
+			});
+		},
+		[applyCheck],
 	);
 
 	const handleClearAll = useCallback(() => setModalCheckedKeys([]), []);
@@ -253,16 +280,53 @@ function TreeSelectorModalInner(
 		else setModalCheckedKeys([...allTreeKeys]);
 	}, [isAllSelected, allTreeKeys]);
 
-	const renderTreeNode = useCallback((nodeData: TreeNodeData) => {
-		return (
-			<div className="flex items-center gap-2 py-0.5">
-				<span className="text-sm">{nodeData.title}</span>
-				{nodeData.info && (
-					<span className="text-xs text-gray-400">— {nodeData.info}</span>
-				)}
-			</div>
-		);
-	}, []);
+	// 当前可见树中所有可展开节点（父节点）的 key，用于「展开/折叠全部」
+	const allParentKeys = useMemo<React.Key[]>(() => {
+		const keys: React.Key[] = [];
+		const walk = (nodes: TreeNodeData[]) => {
+			for (const node of nodes) {
+				if (node.children?.length) {
+					keys.push(node.value);
+					walk(node.children);
+				}
+			}
+		};
+		walk(filteredTreeData);
+		return keys;
+	}, [filteredTreeData]);
+
+	const isAllExpanded = useMemo(
+		() =>
+			allParentKeys.length > 0 &&
+			allParentKeys.every((k) => expandedKeys.includes(k)),
+		[allParentKeys, expandedKeys],
+	);
+
+	const handleToggleExpandAll = useCallback(() => {
+		if (isAllExpanded) setExpandedKeys([]);
+		else setExpandedKeys([...allParentKeys]);
+	}, [isAllExpanded, allParentKeys]);
+
+	const renderTreeNode = useCallback(
+		(nodeData: TreeNodeData) => {
+			return (
+				<div
+					className="flex items-center gap-2 py-0.5 cursor-pointer select-none"
+					onClick={(e) => {
+						// 阻止冒泡，避免触发 Tree 默认的选中/展开行为
+						e.stopPropagation();
+						handleNodeTitleClick(nodeData);
+					}}
+				>
+					<span className="text-sm">{nodeData.title}</span>
+					{nodeData.info && (
+						<span className="text-xs text-gray-400">— {nodeData.info}</span>
+					)}
+				</div>
+			);
+		},
+		[handleNodeTitleClick],
+	);
 
 	const open = useCallback(
 		(props: TreeSelectorModalOpenProps) => {
@@ -322,7 +386,23 @@ function TreeSelectorModalInner(
 							}}
 							title={
 								<div className="flex justify-between items-center">
-									<span className="text-base">列表选择区域</span>
+									<div className="flex-center">
+										<span className="text-base mr-4">列表选择区域</span>
+										<Button
+											shape="circle"
+											size="small"
+											disabled={allParentKeys.length === 0}
+											onClick={handleToggleExpandAll}
+												
+										>
+											{isAllExpanded ? (
+												<CaretDownOutlined />
+											) : (
+												<CaretRightOutlined />
+											)}
+										</Button>
+									</div>
+
 									<Button type="link" size="small" onClick={handleSelectAll}>
 										{isAllSelected ? "取消全选" : "全选"}
 									</Button>

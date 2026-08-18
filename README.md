@@ -88,6 +88,10 @@ cd react-antd-luminous-admin
 # 安装依赖
 pnpm install
 
+# 安装过程中如果出现 【Ignored build scripts: esbuild@0.11.3, esbuild@0.28.2】警告，请执行：
+pnpm approve-builds
+然后选择esbuild，输入 y，按下回车确认
+
 # 启动开发服务器（自带 Mock API，端口见 .env 中的 VITE_PORT）
 pnpm dev
 
@@ -99,6 +103,7 @@ pnpm preview
 
 # 代码检查
 pnpm lint
+
 ```
 
 ---
