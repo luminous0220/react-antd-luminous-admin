@@ -41,6 +41,7 @@ import { Toolbar } from "./Toolbar";
 import { SelectedInfo } from "./SelectedInfo";
 import { DragHandle, SortableRow } from "./DragSortRow";
 import { SearchOutlined } from "@ant-design/icons";
+import { throttle } from "lodash";
 
 export function ProTableInner<T>(
 	props: ProTableProps<T>,
@@ -97,7 +98,17 @@ export function ProTableInner<T>(
 	// 强制刷新标识
 	const forceRefreshRef = useRef(false);
 
+	const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+
+	const handleDelayCloseLoading = () => {
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			setLoading(false);
+		}, 300);
+	};
+
 	const ignore = useRef(false);
+
 	// 刷新数据（合并筛选参数）
 	const refresh = useCallback(async () => {
 		if (!api || ignore.current) return;
@@ -113,39 +124,10 @@ export function ProTableInner<T>(
 			setDataSource(result.data);
 			setTotal(result.total || 0);
 		} finally {
-			setLoading(false);
+			handleDelayCloseLoading();
 			ignore.current = false;
 		}
 	}, [api, pagination.pageNumber, pagination.pageSize, searchValues]);
-
-	// 暴露实例方法给父组件
-	useImperativeHandle(
-		ref,
-		() => ({
-			refresh,
-			getDataSource: () => dataSource,
-			clearSelected: () => {
-				setSelectedRowKeys([]);
-				setSelectedRows([]);
-				onSelectRows?.([]);
-			},
-			setSearchValues: (values: Record<string, unknown>) => {
-				setSearchValues(values);
-			},
-			reset: () => {
-				setSearchValues(search?.initialValues ?? {});
-				setPagination(defaultPagination);
-			},
-			setLoading,
-		}),
-		[
-			refresh,
-			dataSource,
-			onSelectRows,
-			search?.initialValues,
-			defaultPagination,
-		],
-	);
 
 	// 自动请求
 	useEffect(() => {
@@ -330,7 +312,7 @@ export function ProTableInner<T>(
 				setLoading(true);
 				await onExport(selectedRows);
 			} finally {
-				setLoading(false);
+				handleDelayCloseLoading();
 			}
 			return;
 		}
@@ -418,9 +400,29 @@ export function ProTableInner<T>(
 	);
 
 	// 筛选表单查询回调
-	const handleSearch = useCallback((values: Record<string, unknown>) => {
-		setSearchValues(values);
-	}, []);
+	// 1. 使用 useMemo 缓存节流函数，确保组件生命周期内只有一个节流实例
+	const throttleSetSearchValues = useMemo(
+		() =>
+			throttle((values: Record<string, unknown>) => {
+				setSearchValues(values);
+			}, 800), // 500ms 节流延迟
+		[setSearchValues], // 空依赖数组，确保只在组件挂载时创建一次
+	);
+
+	// 2. 使用 useCallback 包裹，保持引用稳定，方便传给子组件
+	const handleSearch = useCallback(
+		(values: Record<string, unknown>) => {
+			forceRefreshRef.current = true;
+			throttleSetSearchValues(values);
+		},
+		[throttleSetSearchValues],
+	);
+
+	useEffect(() => {
+		return () => {
+			throttleSetSearchValues.cancel(); // 组件卸载时取消未执行的防抖任务
+		};
+	}, [throttleSetSearchValues]);
 
 	// 分页配置
 	const paginationConfig = useMemo(() => {
@@ -478,7 +480,7 @@ export function ProTableInner<T>(
 		}
 		if (scroll) return scroll;
 		if (isMobile) return { x: "max-content", y: "420px" };
-		return { y: "calc(100vh - 420px)" };
+		return { x: "max-content", y: "calc(100vh - 420px)" };
 	}, [scroll, isMobile, restProps.virtual, virtualScrollX]);
 
 	// 稳定的 Table props（无拖拽时的基础配置，拖拽时在此基础上覆盖 components）
@@ -522,6 +524,36 @@ export function ProTableInner<T>(
 		};
 	}, [baseTableProps, dragSort]);
 
+	// 暴露实例方法给父组件
+	useImperativeHandle(
+		ref,
+		() => ({
+			refresh,
+			getDataSource: () => dataSource,
+			clearSelected: () => {
+				setSelectedRowKeys([]);
+				setSelectedRows([]);
+				onSelectRows?.([]);
+			},
+			setSearchValues: (values: Record<string, unknown>) => {
+				handleSearch(values);
+			},
+			reset: () => {
+				setSearchValues(search?.initialValues ?? {});
+				setPagination(defaultPagination);
+			},
+			setLoading,
+		}),
+		[
+			refresh,
+			dataSource,
+			onSelectRows,
+			search?.initialValues,
+			defaultPagination,
+			handleSearch,
+		],
+	);
+
 	return (
 		<>
 			{/* 筛选表单 */}
@@ -543,6 +575,9 @@ export function ProTableInner<T>(
 							confirmText: "查询",
 							resetText: "重置",
 							confirmIcon: <SearchOutlined />,
+						}}
+						onReset={async (values: Record<string, any>) => {
+							handleSearch(values);
 						}}
 						onConfirm={async (_, values: Record<string, unknown>) => {
 							handleSearch(values);
