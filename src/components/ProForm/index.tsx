@@ -54,7 +54,6 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			destroyOnHidden = false,
 			onClose,
 			footer,
-			children,
 			...formProps
 		} = props;
 		const isMobile = useGlobalStore((s) => s.isMobile);
@@ -362,7 +361,6 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 					layout={layout}
 				>
 					{renderedFields}
-					{children}
 					{type === "pure" && renderedFooter}
 				</Form>
 			</>

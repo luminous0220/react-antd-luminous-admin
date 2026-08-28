@@ -134,8 +134,6 @@ type ProFormProps = Omit<FormProps, "fields" | "title" | "onFinish"> & {
 	destroyOnHidden?: boolean;
 	/** 弹窗/抽屉关闭回调 */
 	onClose?: () => void;
-	/** 自定义内容，渲染在表单字段与 footer 之间 */
-	children?: React.ReactNode;
 	/** 顶部内容，渲染在表单字段上方 */
 	topContent?: React.ReactNode;
 	/**
