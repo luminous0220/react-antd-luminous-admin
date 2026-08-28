@@ -3,28 +3,71 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 // 预设颜色配置
 export const PRESET_COLORS = {
-	blue: "#427bff",
-	orange: "#fa8c16",
-	green: "#52c41a",
-	purple: "#722ed1",
-	cyan: "#13c2c2",
-	magenta: "#eb2f96",
+	blue: "#438CFC",
+	orange: "#db9b34",
+	green: "#b1d5c8",
+	red: "#ba5140",
+	cyan: "#80a492",
+	magenta: "#f091a0",
 };
 
 export type PresetColorKey = keyof typeof PRESET_COLORS;
 
-// 颜色变体接口
+// ===== HSL 工具（无依赖） =====
+const hexToHsl = (hex: string) => {
+	const r = parseInt(hex.slice(1, 3), 16) / 255;
+	const g = parseInt(hex.slice(3, 5), 16) / 255;
+	const b = parseInt(hex.slice(5, 7), 16) / 255;
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+	let h = 0;
+	let s = 0;
+	const l = (max + min) / 2;
+	if (max !== min) {
+		const d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		switch (max) {
+			case r:
+				h = (g - b) / d + (g < b ? 6 : 0);
+				break;
+			case g:
+				h = (b - r) / d + 2;
+				break;
+			case b:
+				h = (r - g) / d + 4;
+				break;
+		}
+		h *= 60;
+	}
+	return { h, s: s * 100, l: l * 100 };
+};
+
+const hslToHex = (h: number, s: number, l: number) => {
+	s /= 100;
+	l /= 100;
+	const a = s * Math.min(l, 1 - l);
+	const f = (n: number) => {
+		const k = (n + h / 30) % 12;
+		const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+		return Math.round(c * 255)
+			.toString(16)
+			.padStart(2, "0");
+	};
+	return `#${f(0)}${f(8)}${f(4)}`;
+};
+
+// ===== 颜色变体接口（只保留 p 色阶） =====
 export interface ColorVariants {
-	primary: string;
-	deep: string;
-	light: string;
-	lighter: string;
-	lightest: string;
-	textPrimary: string;
-	textSecondary: string;
-	gradientEnd: string;
-	border: string;
-	borderLight: string;
+	p: string;
+	p100: string; // 最浅（背景 hover / 极淡装饰）
+	p200: string; // 浅（弱化背景 / 分割线）
+	p300: string; // 中浅（边框 / 描边）
+	p400: string; // 主色 = 原始颜色
+	p500?: string; // 略深（按需启用）
+	p600?: string; // 深（按下/激活）
+	p700?: string; // 更深（hover on dark）
+	p800?: string; // 更深（hover on dark）
+	p900?: string; // 更深（hover on dark）
 }
 
 /**
@@ -34,35 +77,27 @@ export interface ColorVariants {
  */
 export const generateColorVariants = (
 	primaryColor: string,
-	isDark: boolean,
+	isDark: boolean, // 当前保留参数，便于以后按模式微调
 ): ColorVariants => {
-	const hex = primaryColor.replace("#", "");
-	const r = parseInt(hex.substring(0, 2), 16);
-	const g = parseInt(hex.substring(2, 4), 16);
-	const b = parseInt(hex.substring(4, 6), 16);
+	const { h, s, l } = hexToHsl(primaryColor);
+
+	// 限制亮度在 [0, 95] 区间，避免出现纯白/纯黑
+	const shift = (delta: number) =>
+		hslToHex(h, s, Math.max(0, Math.min(95, l + delta)));
 
 	return {
-		primary: primaryColor,
-		deep: `rgb(${Math.floor(r * 0.7)}, ${Math.floor(g * 0.7)}, ${Math.floor(b * 0.7)})`,
-		light: isDark
-			? `rgba(${r}, ${g}, ${b}, 0.35)`
-			: `rgba(${r}, ${g}, ${b}, 0.6)`,
-		lighter: `rgba(${r}, ${g}, ${b}, 0.25)`,
-		lightest: `rgba(${r}, ${g}, ${b}, 0.15)`,
-		textPrimary: isDark
-			? `rgba(${r}, ${g}, ${b}, 0.9)`
-			: `rgb(${Math.floor(r * 0.8)}, ${Math.floor(g * 0.8)}, ${Math.floor(b * 0.8)})`,
-		textSecondary: isDark
-			? `rgba(${r}, ${g}, ${b}, 0.7)`
-			: `rgba(${r}, ${g}, ${b}, 0.6)`,
-		gradientEnd: `rgb(${Math.floor(r * 0.85)}, ${Math.floor(g * 0.85)}, ${Math.floor(b * 0.85)})`,
-		border: isDark
-			? `rgba(${r}, ${g}, ${b}, 0.3)`
-			: `rgba(${r}, ${g}, ${b}, 0.4)`,
-		borderLight: isDark
-			? `rgba(${r}, ${g}, ${b}, 0.2)`
-			: `rgba(${r}, ${g}, ${b}, 0.3)`,
-	};
+		p: primaryColor,
+		p100: shift(+35), // 最浅
+		p200: shift(+22),
+		p300: shift(+10),
+		p400: primaryColor, // 基色
+		p500: shift(-10),
+		p600: shift(-20),
+		p700: shift(-30),
+		p800: shift(-40),
+		p900: shift(-50),
+		_isDark: isDark, // 防止 unused 警告；如不需要可删
+	} as ColorVariants;
 };
 
 /**
@@ -86,11 +121,13 @@ const syncThemeToDOM = (isDark: boolean) => {
  */
 const syncThemeToCSSVariables = (variants: ColorVariants) => {
 	const root = document.documentElement;
-	// 遍历变体对象，生成 --theme-primary, --theme-light 等 CSS 变量
-	Object.entries(variants).forEach(([key, value]) => {
-		// 将 camelCase 转换为 kebab-case (例如: textPrimary -> text-primary)
-		const cssVarName = `--theme-${key.replace(/([A-Z])/g, "-$1").toLowerCase()}`;
-		root.style.setProperty(cssVarName, value);
+	// 主色
+	root.style.setProperty("--p", variants.p);
+	// 数字色阶：键名 p100 → --p-100
+	(Object.keys(variants) as (keyof ColorVariants)[]).forEach((key) => {
+		if (typeof key === "string" && /^p\d+$/.test(key)) {
+			root.style.setProperty(`--${key}`, variants[key] as string);
+		}
 	});
 };
 
@@ -154,7 +191,7 @@ export const useThemeStore = create<ThemeStoreState>()(
 				const colorVariants = generateColorVariants(colorPrimary, isDark);
 				syncThemeToCSSVariables(colorVariants);
 				set({
-					colorVariants
+					colorVariants,
 				});
 			},
 		}),

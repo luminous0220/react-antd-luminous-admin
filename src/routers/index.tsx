@@ -8,6 +8,7 @@ import Login from "@/pages/Login";
 import { Spin } from "antd";
 import { AuthGuard, RedirectIfAuthenticated } from "./AuthGuard";
 import { useAuthStore } from "@/stores/auth";
+import Profile from "@/pages/Profile";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
 
@@ -35,6 +36,21 @@ export function AppRouter() {
 						element: <Navigate to={CFG.HOME_PATH} replace />,
 					},
 					...dynamicRoutes,
+					// 个人信息静态路由（?tab=password 直达修改密码）
+					{
+						path: "/profile",
+						element: (
+							<Suspense
+								fallback={
+									<div className="size-full flex items-center justify-center">
+										<Spin />
+									</div>
+								}
+							>
+								<Profile />
+							</Suspense>
+						),
+					},
 					{
 						path: "*",
 						element: <NotFound />,

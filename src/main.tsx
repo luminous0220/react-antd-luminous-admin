@@ -1,9 +1,7 @@
 // src/main.tsx
-import "./styles/common.scss";
 import "./styles/tailwind.css";
-import "./styles/theme.scss";
 import "./styles/reset.css";
-
+import "./styles/theme.scss";
 import "animate.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

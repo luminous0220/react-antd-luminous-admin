@@ -6,7 +6,6 @@ import dayjs from "dayjs";
 import "dayjs/locale/zh-cn";
 import { MessageHolder, FullLoadingHolder } from "./hooks";
 import { useThemeStore } from "./stores";
-import { useEffect } from "react";
 import { AppRouter } from "./routers";
 
 const queryClient = new QueryClient({
@@ -19,27 +18,27 @@ const queryClient = new QueryClient({
 
 dayjs.locale("zh-cn");
 
-
-
 const App = () => {
 	const { isDark, colorPrimary } = useThemeStore();
 
-	useEffect(() => {
-		useThemeStore.getState().recomputeTheme();
-	}, []);
-
 	return (
-		<div className="root-bg size-full">
+		<div className="size-full">
 			<ConfigProvider
 				locale={locale}
 				theme={{
 					algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,
 					token: {
 						colorPrimary,
-						colorTextBase: isDark ? "#b1b1c7" : "#030229",
+						colorBgBase: isDark ? "#0A0A0A" : "#fff",
+						colorTextBase: isDark ? "#fff" : "#030229",
 						colorBgContainer: isDark ? "#161618" : "#FFFFFF",
 						colorBgLayout: isDark ? "#000000" : "#F8FAFE",
 						borderRadius: 10,
+					},
+					components: {
+						Modal: {
+							colorBgElevated: isDark ? "#0A0A0A" : "#fff",
+						},
 					},
 				}}
 			>

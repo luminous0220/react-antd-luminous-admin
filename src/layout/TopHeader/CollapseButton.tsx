@@ -40,7 +40,7 @@ export const CollapseButton = ({
         transition: "all 0.2s",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = colorVariants.lightest;
+        e.currentTarget.style.background = colorVariants.p100;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.background = "transparent";

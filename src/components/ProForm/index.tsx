@@ -45,6 +45,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 			topContent,
 			defaultButtons,
 			onConfirm,
+			onReset,
 			initialValues,
 			collapsible,
 			form: externalForm,
@@ -204,7 +205,8 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 		const handleReset = useCallback(() => {
 			form.resetFields();
 			form.setFieldsValue(baselineRef.current);
-		}, [form]);
+			onReset?.(baselineRef.current);
+		}, [form, onReset]);
 
 		// 渲染字段列表
 		const renderedFields = useMemo(() => {
@@ -354,6 +356,7 @@ export const ProForm = forwardRef<ProFormInstance, ProFormProps>(
 				<Form
 					form={form}
 					initialValues={normalizedInitialValues}
+					size="large"
 					className={isInlineMode ? "flex gap-x-2 gap-y-3" : ""}
 					{...formProps}
 					layout={layout}

@@ -64,7 +64,7 @@ type BaseFieldConfig = {
 	disabled?: boolean | ((values: FormValues) => boolean);
 	visible?: boolean | ((values: FormValues) => boolean);
 	shouldUpdate?: boolean | ((prev: FormValues, curr: FormValues) => boolean);
-	render?: (value: unknown, form: FormInstance) => ReactNode;
+	render?: (value: any, form: FormInstance) => ReactNode;
 	/** Form.Item 的额外配置 */
 	formItemProps?: FormItemProps;
 };
@@ -78,7 +78,7 @@ type TypedFieldConfig<T extends ComponentType> = BaseFieldConfig & {
 /** 无 type 的自定义渲染字段配置 */
 type CustomFieldConfig = BaseFieldConfig & {
 	type?: undefined;
-	render: (value: unknown, form: FormInstance) => ReactNode;
+	render: (value: any, form: FormInstance) => ReactNode;
 };
 
 /** 完整字段配置类型 */
@@ -120,9 +120,10 @@ type ProFormProps = Omit<FormProps, "fields" | "title" | "onFinish"> & {
 	/** 提交回调，extraParams 为 open() 传入的额外参数 */
 	onConfirm?: (
 		title: string,
-		values: FormValues,
+		values: Record<string, any>,
 		extraParams?: Record<string, any>,
 	) => Promise<void> | void;
+	onReset?: (values: Record<string, any>) => Promise<void> | void;
 	/** 折叠配置，传入后启用折叠功能，不依赖 inline 布局 */
 	collapsible?: ProFormCollapseConfig;
 	/** 显示模式：modal（弹窗，默认）、drawer（抽屉）、pure（纯表单） */

@@ -43,6 +43,7 @@ export const IconSelect: React.FC<IconSelectProps> = ({
 			{...props}
 			value={value}
 			options={options}
+			size="large"
 			showSearch={{
 				filterOption: (input, option) =>
 					(option?.value as string)
@@ -55,7 +56,7 @@ export const IconSelect: React.FC<IconSelectProps> = ({
 				allowClear
 				prefix={
 					prefixIcon ? (
-						<span className="flex items-center text-base">{prefixIcon}</span>
+						<span className="flex items-center text-base p-2 bg-[#EBF7FF] rounded-lg text-[var(--p)] dark:bg-[#070D10]">{prefixIcon}</span>
 					) : null
 				}
 			/>

@@ -132,7 +132,7 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 			disabled: item.type === 1,
 			label: (
 				<div className="flex items-center gap-2 py-0.5">
-					<span >{IconMap[item.icon]}</span>
+					<span>{IconMap[item.icon]}</span>
 					<span className="text-xs ">{item.breadcrumbText}</span>
 				</div>
 			),
@@ -160,7 +160,7 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 			label: "修改密码",
 			icon: <IconKey stroke={1} />,
 			onClick: () => {
-				navigate("/password");
+				navigate("/profile?tab=password");
 			},
 		},
 		{
@@ -214,6 +214,8 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 							onBlur={() => setInputFocused(false)}
 						/>
 					</AutoComplete>
+
+					<Breadcrumb className="shrink-0 max-md:hidden" items={breadcrumbItems} />
 				</div>
 
 				{/* 右侧：主题切换 + 系统设置 + 用户头像（错峰淡入） */}
@@ -228,7 +230,7 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 								size={32}
 								icon={<>🐼</>}
 								style={{
-									background:"#EAF3FF",
+									background: "#EAF3FF",
 									cursor: "pointer",
 								}}
 							/>
@@ -237,7 +239,6 @@ export const TopHeader = ({ setCollapsed, collapsed }: TopHeaderProps) => {
 					</Dropdown>
 				</div>
 			</Header>
-			<Breadcrumb className="mt-4 mb-2 shrink-0" items={breadcrumbItems} />
 		</div>
 	);
 };

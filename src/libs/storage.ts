@@ -109,6 +109,7 @@ function removeToken(): void {
 	removeItem(CFG.TOKEN_KEY);
 }
 
+
 // 导出方法
 export {
 	setItem,

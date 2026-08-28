@@ -1,10 +1,10 @@
 html {
-	--input-outline: rgb(226, 232, 240);
-	--input-hover-bg: rgba(0, 0, 0, 0.04);
-	--input-bg: #f8fafe;
+	--input-bg: transparent;
+	--input-hover-bg: rgb(232, 232, 232, 0.4);
+	--input-hover-border: #e5e7eb;
 	.dark {
-		--input-outline: #424242;
-		--input-hover-bg: rgba(0, 0, 0, 0.2);
-		--input-bg: rgba(0, 0, 0, 0.2);
+		--input-bg: rgb(33, 33, 33);
+		--input-hover-bg: rgb(40, 40, 40);
+		--input-hover-border: #434343;
 	}
 }

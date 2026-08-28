@@ -34,12 +34,18 @@ const ITEM_PADDING_X = 12;
 
 /**
  * @description 递归收集分组下的菜单项（展平子菜单，深层级通过 depth 缩进）
+ * 消费后端 model.Menu（menu_name 为标题，menu_type 为 M/C/F），F 按钮已在上游被过滤
  * @param children 子菜单列表
  * @param depth 当前层级
  */
 const collectItems = (children: IApi.MenuItem[], depth: number): SideItem[] =>
 	children.flatMap((child) => [
-		{ key: child.path, title: child.title, icon: IconMap[child.icon], depth },
+		{
+			key: child.path,
+			title: child.title,
+			icon: IconMap[child.icon],
+			depth,
+		},
 		...(child.children?.length ? collectItems(child.children, depth + 1) : []),
 	]);
 
@@ -47,7 +53,6 @@ const collectItems = (children: IApi.MenuItem[], depth: number): SideItem[] =>
  * @description Logo 头部区域：主题色渐变圆角图标 + 系统名称/副标题
  */
 const SideHeader = ({ collapsed }: { collapsed?: boolean }) => {
-	const colorVariants = useThemeStore((s) => s.colorVariants);
 	const { token } = theme.useToken();
 
 	return (
@@ -57,12 +62,7 @@ const SideHeader = ({ collapsed }: { collapsed?: boolean }) => {
 			}`}
 		>
 			{/* Logo 图标：主题色渐变圆角方块 + 品牌标识 */}
-			<div
-				className="size-[36px] shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#2577F5] to-[#4f93ff]"
-				style={{
-					boxShadow: `0 4px 12px ${colorVariants.lighter}`,
-				}}
-			>
+			<div className="size-[36px] shrink-0 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#2577F5] to-[#4f93ff]">
 				🐼
 			</div>
 
@@ -136,7 +136,7 @@ const MenuItem = memo(
 						className="flex items-center justify-center size-10 mx-auto rounded-xl transition-colors"
 						style={
 							active
-								? { backgroundColor: colorVariants.primary, color: "#fff" }
+								? { backgroundColor: colorVariants.p, color: "#fff" }
 								: { color: token.colorText }
 						}
 					>
@@ -159,9 +159,8 @@ const MenuItem = memo(
 					...(!active && { color: token.colorText }),
 					// 选中态：横向内缩 8px 的圆角高亮块
 					...(active && {
-						backgroundColor: colorVariants.primary,
+						backgroundColor: colorVariants.p,
 						color: "#fff",
-						boxShadow: `0 4px 12px ${colorVariants.lighter}`,
 					}),
 					// 深层级菜单缩进
 					...(item.depth >= 2 && {
@@ -195,11 +194,11 @@ export const Side = ({
 	const groups = useMemo(() => {
 		const result: SideGroup[] = [];
 		const workbench: SideItem[] = [];
-
 		for (const top of menus) {
+			// 有子菜单的一级菜单作为分组标题（M 目录），叶子一级菜单归入「工作台」
 			if (top.children?.length) {
 				result.push({
-					key: top.id,
+					key: String(top.id),
 					title: top.title,
 					items: collectItems(top.children, 1),
 				});
@@ -268,7 +267,7 @@ export const Side = ({
 					{/* 折叠态：仅图标 + Tooltip，不展示分组标题 */}
 					{collapsed &&
 						groups.map((group) => (
-							<div key={group.key} className="space-y-1">
+							<div key={group.key} className="space-y-2">
 								{group.items.map((item) => (
 									<MenuItem
 										key={item.key}
@@ -286,7 +285,7 @@ export const Side = ({
 						groups.map((group) => (
 							<div key={group.key}>
 								<GroupTitle title={group.title} />
-								<div className="space-y-1">
+								<div className="space-y-2">
 									{group.items.map((item) => (
 										<MenuItem
 											key={item.key}
